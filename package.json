@@ -1,7 +1,7 @@
 {
   "name": "funstream",
   "version": "1.0.0",
-  "description": "",
+  "description": "Funstream gives you iteratorish methods on your streams.",
   "main": "funstream.js",
   "scripts": {
     "test": "standard && tap test"
@@ -20,5 +20,16 @@
     "funstream.js",
     "mini-async-sink.js",
     "mini-sync-sink.js"
-  ]
+  ],
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iarna/funstream.git"
+  },
+  "bugs": {
+    "url": "https://github.com/iarna/funstream/issues"
+  },
+  "homepage": "https://npmjs.com/package/funstream"
 }
