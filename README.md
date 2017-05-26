@@ -26,7 +26,7 @@ handling error propagation for you.
 which let's you explicitly tell Funstream if your callbacks are sync or
 async. If you don't include this we'll detect which you're using by looking
 at the number of arguments your callback takes. Because promises and sync functions
-take the same number of arguments, if you're using promise returning callcks you'll need to
+take the same number of arguments, if you're using promise returning callbacks you'll need to
 explicitly pass in `async: true`.
 
 ### fun.ary(array[,opts]) → FunStream
