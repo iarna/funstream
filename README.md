@@ -1,6 +1,6 @@
 # funstream
 
-Funstream let's treat your streams like they're iterators.
+Funstream gives you iteratorish methods on your streams.
 
 ```
 const fun = require('funstream')
@@ -9,7 +9,6 @@ fun.ary([1, 2, 3, 4, 5]).map(n => n + 1).filter(n => n % 2).map(n => `${n}\n`).p
 // prints lines with 3 and 5
 fun.ary([1, 2, 3, 4, 5]).map(n => n + 1).filter(n => n % 2).reduce((a, b) => a + b).then(console.log)
 // prints 8
-d
 ```
 
 Funstream makes object streams better.
