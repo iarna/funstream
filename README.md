@@ -59,6 +59,11 @@ without constructing additional streams, so:
 The second `filter` call actually returns the same stream object.  This does
 mean that if you try to fork the streams inbetween it won't work. Sorry.
 
+### .pipe(target[, opts]) → FunStream(target)
+
+Like an ordinary pipe, but funerer.  In addition mutating the target into a
+funstream we also forward errors to it.
+
 ### .filter(filterWith[, opts]) → FunStream
 
 Filter the stream! 

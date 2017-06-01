@@ -25,6 +25,12 @@ function funify (stream, opts) {
   stream.filter = FunStream.prototype.filter
   stream.map = FunStream.prototype.map
   stream.forEach = FunStream.prototype.forEach
+
+  const originalPipe = stream.pipe
+  stream.pipe = function (into, opts) {
+    this.on('error', err => into.emit('error', err))
+    return fun(originalPipe.call(this, into, opts))
+  }
   return stream
 }
 
@@ -51,19 +57,20 @@ class FunStream extends MiniPass {
     this.opts = opts || {}
     this.async = this.opts.async
   }
+  pipe (into, opts) {
+    this.on('error', err => into.emit('error', err))
+    return fun(super.pipe(into, opts))
+  }
   filter (filterWith, opts) {
     const filter = FilterStream(filterWith, opts ? Object.assign(this.opts, opts) : this.opts)
-    this.on('error', err => filter.emit('error', err))
     return this.pipe(filter)
   }
   map (mapWith, opts) {
     const map = MapStream(mapWith, opts ? Object.assign(this.opts, opts) : this.opts)
-    this.on('error', err => map.emit('error', err))
     return this.pipe(map)
   }
   reduce (reduceWith, initial, opts) {
     return new module.exports.Promise((resolve, reject) => {
-      this.once('error', reject)
       const reduce = this.pipe(ReduceStream(reduceWith, initial, opts ? Object.assign(this.opts, opts) : this.opts))
       reduce.once('error', reject)
       reduce.once('result', resolve)
@@ -71,7 +78,6 @@ class FunStream extends MiniPass {
   }
   forEach (consumeWith, opts) {
     return new module.exports.Promise((resolve, reject) => {
-      this.once('error', reject)
       const consume = this.pipe(ConsumeStream(consumeWith, opts ? Object.assign(this.opts, opts) : this.opts))
       consume.once('error', reject)
       consume.once('finish', resolve)
@@ -112,10 +118,6 @@ class FilterStreamAsync extends FunStream {
     }
     return false
   }
-  pipe (target) {
-    this.on('error', err => target.emit(err))
-    return super.pipe(target)
-  }
 }
 
 class FilterStreamSync extends FunStream {
@@ -145,10 +147,6 @@ class FilterStreamSync extends FunStream {
       return this
     }
   }
-  pipe (target) {
-    this.on('error', err => target.emit(err))
-    return super.pipe(target)
-  }
 }
 
 function MapStream (mapWith, opts) {
@@ -176,10 +174,6 @@ class MapStreamAsync extends FunStream {
     }
     return false
   }
-  pipe (target) {
-    this.on('error', err => target.emit(err))
-    return super.pipe(target)
-  }
 }
 
 class MapStreamSync extends FunStream {
@@ -202,10 +196,6 @@ class MapStreamSync extends FunStream {
       this.maps.push(mapWith)
       return this
     }
-  }
-  pipe (target) {
-    this.on('error', err => target.emit(err))
-    return super.pipe(target)
   }
 }
 
