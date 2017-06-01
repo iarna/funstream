@@ -5,9 +5,9 @@ Funstream gives you iteratorish methods on your streams.
 ```
 const fun = require('funstream')
 
-fun.ary([1, 2, 3, 4, 5]).map(n => n + 1).filter(n => n % 2).map(n => `${n}\n`).pipe(process.stdout)
+fun([1, 2, 3, 4, 5]).map(n => n + 1).filter(n => n % 2).map(n => `${n}\n`).pipe(process.stdout)
 // prints lines with 3 and 5
-fun.ary([1, 2, 3, 4, 5]).map(n => n + 1).filter(n => n % 2).reduce((a, b) => a + b).then(console.log)
+fun([1, 2, 3, 4, 5]).map(n => n + 1).filter(n => n % 2).reduce((a, b) => a + b).then(console.log)
 // prints 8
 ```
 
@@ -15,7 +15,7 @@ Funstream makes object streams better.
 
 ## Funstream constructors
 
-### fun.ify(stream[, opts]) → FunStream
+### fun(stream[, opts]) → FunStream
 
 This is probably what you want.
 
@@ -29,7 +29,7 @@ at the number of arguments your callback takes. Because promises and sync functi
 take the same number of arguments, if you're using promise returning callcks you'll need to
 explicitly pass in `async: true`.
 
-### fun.ary(array[,opts]) → FunStream
+### fun(array[,opts]) → FunStream
 
 Returns a funstream that will receive entries from the array one at a time
 while respecting back pressure.
