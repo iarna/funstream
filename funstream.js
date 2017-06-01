@@ -12,7 +12,8 @@ try {
 
 const MiniPass = require('minipass')
 const MiniSyncSink = require('./mini-sync-sink')
-const MiniAsyncSink = require('./mini-async-sink')
+const Transform = require('stream').Transform
+const Writable = require('stream').Writable
 
 function fun (opts) {
   return new FunStream(opts)
@@ -86,8 +87,16 @@ class FunStream extends MiniPass {
 }
 module.exports.FunStream = FunStream
 
+class FunTransform extends Transform {
+  constructor () {
+    super({objectMode: true})
+  }
+}
+funify(FunTransform.prototype)
+
 function isAsync (fun, args, opts) {
-  return (opts && opts.async != null && opts.async) || fun.length > args
+  if (opts && opts.async != null) return opts.async
+  return fun.length > args
 }
 
 function FilterStream (filterWith, opts) {
@@ -98,25 +107,39 @@ function FilterStream (filterWith, opts) {
   }
 }
 
-class FilterStreamAsync extends FunStream {
+class FilterStreamAsync extends FunTransform {
   constructor (filterWith, opts) {
-    super(opts)
-    this.filterWith = filterWith
+    super()
+    this.filters = [filterWith]
   }
-  write (data, _, next) {
-    const filtered = (err, result) => {
-      if (err) {
-        this.emit('error', err)
-        if (next) next(err)
-      } else if (super.write(data, null, next)) {
-        this.emit('drain')
-      }
+  _transform (data, encoding, next) {
+    this._runFilters(data, true, 0, next)
+  }
+  _runfilters (data, keep, nextFilter, next) {
+    if (!keep) return next()
+    if (nextFilter >= this.maps.length) {
+      this.push(data)
+      return next()
     }
-    const result = this.filterWith(data, filtered)
-    if (result.then) {
-      result.then(r => filtered(r), filtered)
+    try {
+      this.filters[nextFilter](data, (err, keep) => {
+        if (err) {
+          return next(err)
+        } else {
+          this._runFilters(data, keep, nextFilter + 1, next)
+        }
+      })
+    } catch (ex) {
+      return next(ex)
     }
-    return false
+  }
+  filter (filterWith, opts) {
+    if (isAsync(filterWith, 1, opts)) {
+      this.filters.push(filterWith)
+      return this
+    } else {
+      return super.filter(filterWith, opts)
+    }
   }
 }
 
@@ -156,38 +179,53 @@ function MapStream (mapWith, opts) {
     return new MapStreamSync(mapWith)
   }
 }
-class MapStreamAsync extends FunStream {
-  constructor (mapWith) {
-    super()
-    this.mapWith = mapWith
-  }
-  write (data, encoding, next) {
-    const mapped = (err, result) => {
-      if (err) return next && next(err)
-      if (super.write(result, encoding, next)) {
-        this.emit('drain')
-      }
-    }
-    const result = this.mapWith(data, mapped)
-    if (result.then) {
-      result.then(r => mapped(r), mapped)
-    }
-    return false
-  }
-}
 
-class MapStreamSync extends FunStream {
+class MapStreamAsync extends FunTransform {
   constructor (mapWith) {
     super()
     this.maps = [mapWith]
   }
-  write (data, encoding, next) {
+  _transform (data, encoding, next) {
+    this._runMaps(data, 0, next)
+  }
+  _runMaps (data, nextMap, next) {
     try {
-      return super.write(this.maps.reduce((data, mapWith) => mapWith(data), data), encoding, next)
+      if (nextMap >= this.maps.length) {
+        this.push(data)
+        return next()
+      }
+      this.maps[nextMap](data, (err, value) => {
+        if (err) {
+          return next(err)
+        } else {
+          this._runMaps(value, nextMap + 1, next)
+        }
+      })
     } catch (ex) {
-      this.emit('error', ex)
-      if (next) next(ex)
+      next(ex)
     }
+  }
+  map (mapWith, opts) {
+    if (isAsync(mapWith, 1, opts)) {
+      this.maps.push(mapWith)
+      return this
+    } else {
+      return super.map(mapWith, opts)
+    }
+  }
+}
+
+class MapStreamSync extends FunTransform {
+  constructor (mapWith) {
+    super()
+    this.maps = [mapWith]
+  }
+  _transform (data, encoding, next) {
+    for (var ii in this.maps) {
+      data = this.maps[ii](data)
+    }
+    this.push(data)
+    next()
   }
   map (mapWith, opts) {
     if (isAsync(mapWith, 1, opts)) {
@@ -206,29 +244,26 @@ function ReduceStream (reduceWith, initial, opts) {
     return new ReduceStreamSync(reduceWith, initial)
   }
 }
-class ReduceStreamAsync extends MiniAsyncSink {
+class ReduceStreamAsync extends Writable {
   constructor (reduceWith, initial) {
-    super()
+    super({objectMode: true})
     this.reduceWith = reduceWith
     this.acc = initial
   }
-  write (data, encoding, next) {
+  _write (data, encoding, next) {
     if (this.acc == null) {
       this.acc = data
-      return true
+      next()
     } else {
       this.reduceWith(this.acc, data, (err, result) => {
-        if (err) return next && next(err)
         this.acc = result
-        this.emit('drain')
-        if (next) next()
+        next(err)
       })
-      return false
     }
   }
   end () {
     super.end()
-    this.emit(result => this.acc)
+    this.emit('result', this.acc)
   }
 }
 
@@ -242,7 +277,12 @@ class ReduceStreamSync extends MiniSyncSink {
     if (this.acc == null) {
       this.acc = data
     } else {
-      this.acc = this.reduceWith(this.acc, data)
+      try {
+        this.acc = this.reduceWith(this.acc, data)
+      } catch (ex) {
+        this.emit(ex)
+        return false
+      }
     }
     if (next) next()
     return true
@@ -255,8 +295,18 @@ class ReduceStreamSync extends MiniSyncSink {
 
 function ConsumeStream (consumeWith, opts) {
   if (isAsync(consumeWith, 1, opts)) {
-    return new MiniAsyncSink({write: consumeWith})
+    return new ConsumeStreamAsync({consumeWith: consumeWith})
   } else {
     return new MiniSyncSink({write: consumeWith})
+  }
+}
+
+class ConsumeStreamAsync extends Writable {
+  constructor (consumeWith) {
+    super()
+    this.consumeWith = consumeWith
+  }
+  _write (data, encoding, next) {
+    this.consumeWith(data, next)
   }
 }

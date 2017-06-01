@@ -21,7 +21,6 @@
   },
   "files": [
     "funstream.js",
-    "mini-async-sink.js",
     "mini-sync-sink.js"
   ],
   "directories": {
