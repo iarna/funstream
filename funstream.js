@@ -8,10 +8,10 @@ try {
   module.exports.Promise = Promise
 }
 
-const MiniPass = require('minipass')
 const MiniSyncSink = require('./mini-sync-sink')
 const Transform = require('stream').Transform
 const Writable = require('stream').Writable
+const PassThrough = require('stream').PassThrough
 
 function fun (stream, opts) {
   if (stream == null) {
@@ -72,9 +72,9 @@ function funary (array, opts) {
   }
 }
 
-class FunStream extends MiniPass {
+class FunStream extends PassThrough {
   constructor (opts) {
-    super(opts)
+    super(Object.assign({objectMode: true}, opts))
     this.opts = opts || {}
   }
   async () {

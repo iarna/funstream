@@ -9,9 +9,7 @@
   "keywords": [],
   "author": "Rebecca Turner <me@re-becca.org> (http://re-becca.org/)",
   "license": "ISC",
-  "dependencies": {
-    "minipass": "^2.0.2"
-  },
+  "dependencies": {},
   "devDependencies": {
     "benchmark": "^2.1.4",
     "chalk": "^1.1.3",
