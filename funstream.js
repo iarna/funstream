@@ -21,7 +21,7 @@ function fun (stream, opts) {
     return funary(stream, opts)
   }
   if (typeof stream === 'object') {
-    if ('read' in stream) {
+    if ('pause' in stream) {
       return funify(stream, opts)
     }
     if ('write' in stream) {
