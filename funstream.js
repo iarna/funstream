@@ -49,7 +49,7 @@ function funify (stream, opts) {
 
   const originalPipe = stream.pipe
   stream.pipe = function (into, opts) {
-    this.on('error', err => into.emit('error', err))
+    this.on('error', (err, stream) => into.emit('error', err, stream || this))
     return funify(originalPipe.call(this, into, opts), this.opts)
   }
   return stream
@@ -86,7 +86,7 @@ class FunStream extends PassThrough {
     return this
   }
   pipe (into, opts) {
-    this.on('error', err => into.emit('error', err))
+    this.on('error', (err, stream) => into.emit('error', err, stream || this))
     return funify(super.pipe(into, opts), this.opts)
   }
   filter (filterWith, opts) {
