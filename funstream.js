@@ -175,23 +175,19 @@ class FilterStreamAsync extends FunTransform {
   }
 }
 
-class FilterStreamSync extends FunStream {
+class FilterStreamSync extends FunTransform {
   constructor (filterWith, opts) {
     super(opts)
     this.filters = [filterWith]
   }
-  write (data, encoding, next) {
+  _transform (data, encoding, next) {
     try {
       if (this.filters.every(fn => fn(data))) {
-        return super.write(data, encoding, next)
-      } else {
-        if (next) next()
-        return true
+        this.push(data, encoding)
       }
+      next()
     } catch (ex) {
-      this.emit('error', ex)
-      if (next) next(ex)
-      return false
+      next(ex)
     }
   }
   filter (filterWith, opts) {
