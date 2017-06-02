@@ -9,6 +9,15 @@ fun([1, 2, 3, 4, 5]).map(n => n + 1).filter(n => n % 2).map(n => `${n}\n`).pipe(
 // prints lines with 3 and 5
 fun([1, 2, 3, 4, 5]).map(n => n + 1).filter(n => n % 2).reduce((a, b) => a + b).then(console.log)
 // prints 8
+
+// If you're not so keen on mutating things, why not try piping into a piping hot fun stream?
+process.stdin.pipe(fun()).map(str => transformStr(str)).pipe(process.stdout)
+
+// You'll also transparently use async functions, so like if `transformStr` is async then you can use:
+// `.map(async str => transformStr(str))`
+// Just make sure you don't forget the async keyword.  Alternatively, you
+// can use the async method in the chain:
+// `.async().map(str => transformStr(str))`
 ```
 
 Funstream makes object streams better.
@@ -37,8 +46,13 @@ while respecting back pressure.
 ### fun([opts]) → FunStream
 
 Make a passthrough Funstream.  You can pipe into this to get access to our
-handy methods.  You'll want to do something about errors in the source
-stream because `pipe` pretends they aren't a thing.
+handy methods.
+
+## Funstream and Pipelines
+
+Contrary to ordinary, BORING streams, we make sure errors are passed along
+when we chain into something.  This applies when you `.map` or `.filter` but
+it ALSO applies when you `.pipe`.
 
 ## Funstream methods
 
