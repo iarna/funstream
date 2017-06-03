@@ -120,7 +120,7 @@ Run some code for every chunk, promise that the stream is done.
 
 Example, print each line:
 ```
-fin(stream)
+fun(stream)
   .forEach(chunk => console.log(chunk)
   .then(() => console.log('Done!'))
 ```
