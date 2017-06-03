@@ -109,7 +109,7 @@ Promise the result of computing everything.
 
 Concat a stream:
 ```
-fun.ify(stream)
+fun(stream)
   .reduce((a, b) => a + b)
   .then(wholeThing => { … })
 ```
@@ -120,7 +120,7 @@ Run some code for every chunk, promise that the stream is done.
 
 Example, print each line:
 ```
-fin.ify(stream)
+fin(stream)
   .forEach(chunk => console.log(chunk)
   .then(() => console.log('Done!'))
 ```
