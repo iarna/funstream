@@ -103,14 +103,14 @@ Transform the stream!
 
 Promise the result of computing everything.
 
-* `reduceWith(a, b) → newData` (can throw)
-* `reduceWith(a, b, cb)` (and `cb(err, newData)`)
-* `reduceWith(a, b) → Promise(newData)
+* `reduceWith(acc, value) → acc` (can throw)
+* `reduceWith(acc, value, cb)` (and `cb(err, acc)`)
+* `reduceWith(acc, value) → Promise(acc)
 
 Concat a stream:
 ```
 fun(stream)
-  .reduce((a, b) => a + b)
+  .reduce((acc, value) => acc + value)
   .then(wholeThing => { … })
 ```
 
