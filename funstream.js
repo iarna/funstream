@@ -27,6 +27,11 @@ function fun (stream, opts) {
     if ('write' in stream) {
       return stream // write streams can't be fun
     }
+    if ('then' in stream) { // promises of fun
+      const resultStream = new FunStream()
+      stream.then(promised => fun(promised).pipe(resultStream), err => resultStream.emit('error', err))
+      return resultStream
+    }
     if (opts == null) {
       return new FunStream(stream)
     }
