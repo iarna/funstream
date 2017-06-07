@@ -51,6 +51,7 @@ function funify (stream, opts) {
   stream.reduceTo = FunStream.prototype.reduceTo
   stream.reduceToArray = FunStream.prototype.reduceToArray
   stream.reduceToObject = FunStream.prototype.reduceToObject
+  stream.sort = FunStream.prototype.sort
   stream.forEach = FunStream.prototype.forEach
   stream.sync = FunStream.prototype.sync
   stream.async = FunStream.prototype.async
@@ -132,6 +133,9 @@ class FunStream extends PassThrough {
   }
   reduceToArray (reduceWith, opts) {
     return this.reduceTo(reduceWith, [], opts)
+  }
+  sort (sortWith, opts) {
+    return fun(this.reduceToArray((acc, value) => acc.push(value)).then(values => values.sort(sortWith)))
   }
   forEach (consumeWith, opts) {
     return new module.exports.Promise((resolve, reject) => {
