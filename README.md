@@ -99,6 +99,24 @@ Transform the stream!
 
 `data` is replaced with `newData` from `mapWith` in the output stream.
 
+### .sort(sortWith, opts) → FunStream
+
+WARNING: This has to load all of your content into memory in order to sort
+it, so be sure to do your filtering or limiting (with `.head`) before you
+call this. This results in a funstream fed from the sorted array.
+
+At the moment `sortWith` must be synchronous (as it's ultimately passed to
+`Array.sort`).  That will likely change in the future.
+
+* `sortWith(a, b) → -1 | 0 | 1` – It's the usual sort comparison function, per `Array.sort`.
+
+Sort a stream alphabetically:
+
+```
+fun(stream)
+  .sort((a, b) => a.localeCompare(b))
+```
+
 ### .reduce(reduceWith[, initial[, opts]]) → Promise
 
 Promise the result of computing everything.
@@ -112,6 +130,27 @@ Concat a stream:
 fun(stream)
   .reduce((acc, value) => acc + value)
   .then(wholeThing => { … })
+```
+
+### .reduceToArray(reduceWith, opts) → Promise
+
+Promise the result of reducing into an array.  Handy when you want to push
+on to an array without worrying about your return value. This is sugar for:
+
+```
+fun(stream)
+  .reduce((acc, value) => { reduceWith(acc, value) ; return acc }, [])
+
+```
+
+### .reduceToArray(reduceWith, opts) → Promise
+
+Promise the result of reducing into an array. Handy when you want to build
+an object without worrying about your return values. This is sugar for:
+
+```
+fun(stream)
+  .reduce((acc, value) => { reduceWith(acc, value) ; return acc }, {})
 ```
 
 ### .forEach(consumeWith[, opts]) → Promise
