@@ -78,6 +78,18 @@ mean that if you try to fork the streams inbetween it won't work. Sorry.
 Like an ordinary pipe, but funerer.  In addition mutating the target into a
 funstream we also forward errors to it.
 
+### .head(numberOfItems) → FunStream
+
+Will only foward the first `numberOfItems` down stream.  The remainder are
+ignored.  At the moment this does not end the stream after the
+`numberOfItems` limit is hit, but in future it likely will.
+
+```
+fun(stream)
+  .head(5)
+  .forEach(item => { // only sees the first five items regardless of how long the stream is.
+  })
+
 ### .filter(filterWith[, opts]) → FunStream
 
 Filter the stream! 

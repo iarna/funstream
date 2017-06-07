@@ -47,6 +47,7 @@ function funify (stream, opts) {
 
   stream.filter = FunStream.prototype.filter
   stream.map = FunStream.prototype.map
+  stream.head = FunStream.prototype.head
   stream.reduce = FunStream.prototype.reduce
   stream.reduceTo = FunStream.prototype.reduceTo
   stream.reduceToArray = FunStream.prototype.reduceToArray
@@ -105,6 +106,10 @@ class FunStream extends PassThrough {
   map (mapWith, opts) {
     const map = MapStream(mapWith, opts ? Object.assign(this.opts, opts) : this.opts)
     return this.pipe(map)
+  }
+  head (maxoutput) {
+    let seen = 0
+    return this.filter(() => seen++ < maxoutput)
   }
   reduce (reduceWith, initial, opts) {
     return new module.exports.Promise((resolve, reject) => {
