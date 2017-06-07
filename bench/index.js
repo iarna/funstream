@@ -1,12 +1,8 @@
 'use strict'
 
 const Benchmark = require('benchmark')
-const chalk = require('chalk')
 const fs = require('fs')
 const path = require('path')
-const rimraf = require('rimraf')
-
-const WARN_RANGE = 5
 
 const suite = new Benchmark.Suite({
   onCycle (event) {

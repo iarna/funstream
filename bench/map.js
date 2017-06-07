@@ -1,5 +1,4 @@
 'use strict'
-const Benchmark = require('benchmark')
 const fun = require('../')
 const stream = require('stream')
 
@@ -10,14 +9,13 @@ class NullSink extends stream.Writable {
   _write (data, encoding, next) {
     if (next) next()
     return true
-  } 
+  }
 }
 
 const data = new Array(1000)
-for (let ii = 0; ii< 1000; ++ii) {
+for (let ii = 0; ii < 1000; ++ii) {
   data.push(ii)
 }
-
 
 module.exports = suite => {
   suite.add('fun-sync', {
