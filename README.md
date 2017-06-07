@@ -89,6 +89,7 @@ fun(stream)
   .head(5)
   .forEach(item => { // only sees the first five items regardless of how long the stream is.
   })
+```
 
 ### .filter(filterWith[, opts]) → FunStream
 
