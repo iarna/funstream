@@ -1,6 +1,6 @@
 {
   "name": "funstream",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Funstream gives you iteratorish methods on your streams.",
   "main": "funstream.js",
   "scripts": {
