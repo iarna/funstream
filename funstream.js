@@ -48,6 +48,9 @@ function funify (stream, opts) {
   stream.filter = FunStream.prototype.filter
   stream.map = FunStream.prototype.map
   stream.reduce = FunStream.prototype.reduce
+  stream.reduceTo = FunStream.prototype.reduceTo
+  stream.reduceToArray = FunStream.prototype.reduceToArray
+  stream.reduceToObject = FunStream.prototype.reduceToObject
   stream.forEach = FunStream.prototype.forEach
   stream.sync = FunStream.prototype.sync
   stream.async = FunStream.prototype.async
@@ -108,6 +111,27 @@ class FunStream extends PassThrough {
       reduce.once('error', reject)
       reduce.once('result', resolve)
     })
+  }
+  reduceTo (reduceWith, initial, opts) {
+    let reduceToObjectWith
+    if (isAsync(reduceWith, 2, opts)) {
+      reduceToObjectWith = (acc, value, cb) => {
+        return new module.exports.Promise((resolve, reject) => {
+          const result = reduceWith(acc, value, err => err ? reject(err) : resolve())
+          if (result && result.then) resolve(result)
+        })
+      }
+    } else {
+      /* eslint no-sequences:0 */
+      reduceToObjectWith = (acc, value) => (reduceWith(acc, value), acc)
+    }
+    return this.reduce(reduceToObjectWith, initial, opts)
+  }
+  reduceToObject (reduceWith, opts) {
+    return this.reduceTo(reduceWith, {}, opts)
+  }
+  reduceToArray (reduceWith, opts) {
+    return this.reduceTo(reduceWith, [], opts)
   }
   forEach (consumeWith, opts) {
     return new module.exports.Promise((resolve, reject) => {
@@ -236,7 +260,6 @@ class MapStreamAsync extends FunTransform {
       }
       const result = this.maps[nextMap](data, handleResult)
       if (result && result.then) return result.then(keep => handleResult(null, keep), handleResult)
-
     } catch (ex) {
       next(ex)
     }
