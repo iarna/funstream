@@ -176,3 +176,14 @@ fun(stream)
   .forEach(chunk => console.log(chunk)
   .then(() => console.log('Done!'))
 ```
+
+## Benchmarks
+
+<table>
+<tr><th>map: fun sync</th><td>565 ops/s</td></tr>
+<tr><th>map: fun async (cb)</th><td>454 ops/s</td></tr>
+<tr><th>map: stream.Transform</th><td>403 ops/s</td></tr>
+<tr><th>map: through2</th><td>311 ops/s</td></tr>
+<tr><th>map: fun async (async/await)</th><td>304 ops/s</td></tr>
+<tr><th>map: fun async (new Promise)</th><td>237</td></tr>
+</table>
