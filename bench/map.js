@@ -1,6 +1,7 @@
 'use strict'
 const fun = require('../')
 const stream = require('stream')
+const through2 = require('through2')
 
 class NullSink extends stream.Writable {
   constructor () {
@@ -13,50 +14,97 @@ class NullSink extends stream.Writable {
 }
 
 const data = new Array(1000)
+let acc = ''
 for (let ii = 0; ii < 1000; ++ii) {
-  data.push(ii)
+  data.push(acc += ii)
 }
+acc = null
 
+class Numbers extends stream.Readable {
+  constructor () {
+    super({objectMode: true})
+    this.ii = 0
+    this.acc = ''
+  }
+  _read () {
+    let flowing = true
+    while (flowing) {
+      if (++this.ii >= 1000) {
+        return this.push(null)
+        return
+      } else {
+        flowing = this.push(this.acc += this.ii)
+      }
+    }
+    return
+  }
+}
 module.exports = suite => {
-  suite.add('fun-sync', {
+  suite.add('stream.Transform 1', {
     defer: true,
     fn (deferred) {
       const out = new NullSink()
       out.on('finish', () => deferred.resolve())
       out.on('error', err => deferred.resolve(console.error('ERR', err)))
-      fun(data).sync().map(n => n + 1).map(n => n % 2).map(n => `${n}\n`).pipe(out)
+      new Numbers().pipe(new stream.Transform({
+        objectMode: true,
+        transform (data, enc, cb) {
+          this.push(data + 1)
+          cb()
+        }
+      })).pipe(out)
+    }
+  })
+  suite.add('through2 1', {
+    defer: true,
+    fn (deferred) {
+      const out = new NullSink()
+      out.on('finish', () => deferred.resolve())
+      out.on('error', err => deferred.resolve(console.error('ERR', err)))
+      new Numbers().pipe(through2.obj(function (data, enc, cb) {
+        this.push(data + 1)
+        cb()
+      })).pipe(out)
+    }
+  })
+  suite.add('fun-sync 1', {
+    defer: true,
+    fn (deferred) {
+      const out = new NullSink()
+      out.on('finish', () => deferred.resolve())
+      out.on('error', err => deferred.resolve(console.error('ERR', err)))
+      fun(new Numbers()).map(n => n + 1).pipe(out)
     }
   })
 
-  suite.add('fun-promise', {
+  suite.add('fun-async 1', {
     defer: true,
     fn (deferred) {
       const out = new NullSink()
       out.on('finish', () => deferred.resolve())
       out.on('error', err => deferred.resolve(console.error('ERR', err)))
-      fun(data).async().map(n => Promise.resolve(n + 1)).map(n => Promise.resolve(n % 2)).map(n => Promise.resolve(`${n}\n`)).pipe(out)
+      fun(new Numbers()).async().map(async n => await n + 1).pipe(out)
+    }
+  })
+  suite.add('fun-cb 1', {
+    defer: true,
+    fn (deferred) {
+      const out = new NullSink()
+      out.on('finish', () => deferred.resolve())
+      out.on('error', err => deferred.resolve(console.error('ERR', err)))
+      fun(new Numbers()).async().map((n, cb) => cb(null, n + 1)).pipe(out)
+    }
+  })
+  suite.add('fun-promise 1', {
+    defer: true,
+    fn (deferred) {
+      const out = new NullSink()
+      out.on('finish', () => deferred.resolve())
+      out.on('error', err => deferred.resolve(console.error('ERR', err)))
+      fun(new Numbers()).async().map(n => Promise.resolve(n + 1)).pipe(out)
     }
   })
 
-  suite.add('fun-async', {
-    defer: true,
-    fn (deferred) {
-      const out = new NullSink()
-      out.on('finish', () => deferred.resolve())
-      out.on('error', err => deferred.resolve(console.error('ERR', err)))
-      fun(data).async().map(async n => n + 1).map(async n => n % 2).map(async n => `${n}\n`).pipe(out)
-    }
-  })
-
-  suite.add('fun-cb', {
-    defer: true,
-    fn (deferred) {
-      const out = new NullSink()
-      out.on('finish', () => deferred.resolve())
-      out.on('error', err => deferred.resolve(console.error('ERR', err)))
-      fun(data).async().map((n, cb) => cb(null, n + 1)).map((n, cb) => cb(null, n % 2)).map((n, cb) => cb(null, `${n}\n`)).pipe(out)
-    }
-  })
 
   suite.add('stream.Transform', {
     defer: true,
@@ -64,7 +112,7 @@ module.exports = suite => {
       const out = new NullSink()
       out.on('finish', () => deferred.resolve())
       out.on('error', err => deferred.resolve(console.error('ERR', err)))
-      fun(data).pipe(new stream.Transform({
+      new Numbers().pipe(new stream.Transform({
         objectMode: true,
         transform (data, enc, cb) {
           this.push(data + 1)
@@ -83,6 +131,64 @@ module.exports = suite => {
           cb()
         }
       })).pipe(out)
+    }
+  })
+  suite.add('through2', {
+    defer: true,
+    fn (deferred) {
+      const out = new NullSink()
+      out.on('finish', () => deferred.resolve())
+      out.on('error', err => deferred.resolve(console.error('ERR', err)))
+      new Numbers().pipe(through2.obj(function (data, enc, cb) {
+        this.push(data + 1)
+        cb()
+      })).pipe(through2.obj(function (data, enc, cb) {
+        this.push(data % 2)
+        cb()
+      })).pipe(through2.obj(function (data, enc, cb) {
+        this.push(`${data}\n`)
+        cb()
+      })).pipe(out)
+    }
+  })
+
+  suite.add('fun-sync', {
+    defer: true,
+    fn (deferred) {
+      const out = new NullSink()
+      out.on('finish', () => deferred.resolve())
+      out.on('error', err => deferred.resolve(console.error('ERR', err)))
+      fun(new Numbers()).sync().map(n => n + 1).map(n => n % 2).map(n => `${n}\n`).pipe(out)
+    }
+  })
+
+  suite.add('fun-async', {
+    defer: true,
+    fn (deferred) {
+      const out = new NullSink()
+      out.on('finish', () => deferred.resolve())
+      out.on('error', err => deferred.resolve(console.error('ERR', err)))
+      fun(new Numbers()).async().map(async n => await n + 1).map(async n => await n % 2).map(async n => await `${n}\n`).pipe(out)
+    }
+  })
+
+  suite.add('fun-cb', {
+    defer: true,
+    fn (deferred) {
+      const out = new NullSink()
+      out.on('finish', () => deferred.resolve())
+      out.on('error', err => deferred.resolve(console.error('ERR', err)))
+      fun(new Numbers()).async().map((n, cb) => cb(null, n + 1)).map((n, cb) => cb(null, n % 2)).map((n, cb) => cb(null, `${n}\n`)).pipe(out)
+    }
+  })
+
+  suite.add('fun-promise', {
+    defer: true,
+    fn (deferred) {
+      const out = new NullSink()
+      out.on('finish', () => deferred.resolve())
+      out.on('error', err => deferred.resolve(console.error('ERR', err)))
+      fun(new Numbers()).async().map(n => Promise.resolve(n + 1)).map(n => Promise.resolve(n % 2)).map(n => Promise.resolve(`${n}\n`)).pipe(out)
     }
   })
 
