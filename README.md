@@ -5,19 +5,29 @@ Funstream gives you iteratorish methods on your streams.
 ```
 const fun = require('funstream')
 
-fun([1, 2, 3, 4, 5]).map(n => n + 1).filter(n => n % 2).map(n => `${n}\n`).pipe(process.stdout)
+fun([1, 2, 3, 4, 5])
+  .map(n => n + 1)
+  .filter(n => n % 2)
+  .map(n => `${n}\n`)
+  .pipe(process.stdout)
 // prints lines with 3 and 5
-fun([1, 2, 3, 4, 5]).map(n => n + 1).filter(n => n % 2).reduce((a, b) => a + b).then(console.log)
+fun([1, 2, 3, 4, 5])
+  .map(n => n + 1)
+  .filter(n => n % 2)
+  .reduce((a, b) => a + b)
+  .then(console.log)
 // prints 8
 
 // If you're not so keen on mutating things, why not try piping into a piping hot fun stream?
-process.stdin.pipe(fun()).map(str => transformStr(str)).pipe(process.stdout)
+process.stdin.pipe(fun())
+  .map(str => transformStr(str))
+  .pipe(process.stdout)
 
 // You'll also transparently use async functions, so like if `transformStr` is async then you can use:
-// `.map(async str => transformStr(str))`
+ .map(async str => transformStr(str))
 // Just make sure you don't forget the async keyword.  Alternatively, you
 // can use the async method in the chain:
-// `.async().map(str => transformStr(str))`
+ .async().map(str => transformStr(str))
 ```
 
 Funstream makes object streams better.
