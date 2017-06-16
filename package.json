@@ -2,7 +2,7 @@
   "name": "funstream",
   "version": "2.1.1",
   "description": "Funstream gives you iteratorish methods on your streams.",
-  "main": "funstream.js",
+  "main": "index.js",
   "scripts": {
     "test": "standard && tap test"
   },
@@ -17,8 +17,18 @@
     "through2": "^2.0.3"
   },
   "files": [
-    "funstream.js",
-    "mini-sync-sink.js"
+    "index.js",
+    "fun-stream.js",
+    "fun-array.js",
+    "fun-passthrough.js",
+    "fun-stream.js",
+    "fun-transform.js",
+    "filter-stream.js",
+    "map-stream.js",
+    "reduce-stream.js",
+    "for-each-stream.js",
+    "mini-sync-sink.js",
+    "null-sink.js"
   ],
   "directories": {
     "test": "test"
