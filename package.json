@@ -1,6 +1,6 @@
 {
   "name": "funstream",
-  "version": "1.0.1",
+  "version": "2.1.1",
   "description": "Funstream gives you iteratorish methods on your streams.",
   "main": "funstream.js",
   "scripts": {
@@ -9,16 +9,15 @@
   "keywords": [],
   "author": "Rebecca Turner <me@re-becca.org> (http://re-becca.org/)",
   "license": "ISC",
-  "dependencies": {
-    "minipass": "^2.0.2"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "benchmark": "^2.1.4",
     "standard": "^10.0.2",
-    "tap": "^10.3.2"
+    "tap": "^10.3.2",
+    "through2": "^2.0.3"
   },
   "files": [
     "funstream.js",
-    "mini-async-sink.js",
     "mini-sync-sink.js"
   ],
   "directories": {

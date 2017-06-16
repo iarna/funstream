@@ -1,7 +1,5 @@
 'use strict'
 module.exports = fun
-module.exports.ify = funify
-module.exports.ary = funary
 // module.exports.FunStream = FunStream (modern classes, boo)
 
 try {
@@ -10,21 +8,60 @@ try {
   module.exports.Promise = Promise
 }
 
-const MiniPass = require('minipass')
 const MiniSyncSink = require('./mini-sync-sink')
-const MiniAsyncSink = require('./mini-async-sink')
+const Transform = require('stream').Transform
+const Writable = require('stream').Writable
+const PassThrough = require('stream').PassThrough
 
-function fun (opts) {
-  return new FunStream(opts)
+function fun (stream, opts) {
+  if (stream == null) {
+    return new FunStream()
+  }
+  if (Array.isArray(stream)) {
+    return funary(stream, opts)
+  }
+  if (typeof stream === 'object') {
+    if ('pause' in stream) {
+      return funify(stream, opts)
+    }
+    if ('write' in stream) {
+      return stream // write streams can't be fun
+    }
+    if ('then' in stream) { // promises of fun
+      const resultStream = new FunStream()
+      stream.then(promised => fun(promised).pipe(resultStream), err => resultStream.emit('error', err))
+      return resultStream
+    }
+    if (opts == null) {
+      return new FunStream(stream)
+    }
+  }
+  throw new Error(`funstream invalid arguments, expected: fun([stream | array], [opts]), got: fun(${[].map.call(arguments, arg => typeof arg).join(', ')})`)
 }
 
 function funify (stream, opts) {
+  if (stream instanceof FunStream || stream.isFun) return stream
+  stream.isFun = true
   stream.opts = opts || {}
   stream.async = stream.opts.async
 
   stream.filter = FunStream.prototype.filter
   stream.map = FunStream.prototype.map
+  stream.head = FunStream.prototype.head
+  stream.reduce = FunStream.prototype.reduce
+  stream.reduceTo = FunStream.prototype.reduceTo
+  stream.reduceToArray = FunStream.prototype.reduceToArray
+  stream.reduceToObject = FunStream.prototype.reduceToObject
+  stream.sort = FunStream.prototype.sort
   stream.forEach = FunStream.prototype.forEach
+  stream.sync = FunStream.prototype.sync
+  stream.async = FunStream.prototype.async
+
+  const originalPipe = stream.pipe
+  stream.pipe = function (into, opts) {
+    this.on('error', (err, stream) => into.emit('error', err, stream || this))
+    return funify(originalPipe.call(this, into, opts), this.opts)
+  }
   return stream
 }
 
@@ -45,33 +82,68 @@ function funary (array, opts) {
   }
 }
 
-class FunStream extends MiniPass {
+class FunStream extends PassThrough {
   constructor (opts) {
-    super(opts)
+    super(Object.assign({objectMode: true}, opts))
     this.opts = opts || {}
-    this.async = this.opts.async
+  }
+  async () {
+    this.opts.async = true
+    return this
+  }
+  sync () {
+    this.opts.async = false
+    return this
+  }
+  pipe (into, opts) {
+    this.on('error', (err, stream) => into.emit('error', err, stream || this))
+    return funify(super.pipe(into, opts), this.opts)
   }
   filter (filterWith, opts) {
     const filter = FilterStream(filterWith, opts ? Object.assign(this.opts, opts) : this.opts)
-    this.on('error', err => filter.emit('error', err))
     return this.pipe(filter)
   }
   map (mapWith, opts) {
     const map = MapStream(mapWith, opts ? Object.assign(this.opts, opts) : this.opts)
-    this.on('error', err => map.emit('error', err))
     return this.pipe(map)
+  }
+  head (maxoutput) {
+    let seen = 0
+    return this.filter(() => seen++ < maxoutput)
   }
   reduce (reduceWith, initial, opts) {
     return new module.exports.Promise((resolve, reject) => {
-      this.once('error', reject)
       const reduce = this.pipe(ReduceStream(reduceWith, initial, opts ? Object.assign(this.opts, opts) : this.opts))
       reduce.once('error', reject)
       reduce.once('result', resolve)
     })
   }
+  reduceTo (reduceWith, initial, opts) {
+    let reduceToObjectWith
+    if (isAsync(reduceWith, 2, opts)) {
+      reduceToObjectWith = (acc, value, cb) => {
+        return new module.exports.Promise((resolve, reject) => {
+          const result = reduceWith(acc, value, err => err ? reject(err) : resolve())
+          if (result && result.then) resolve(result)
+        })
+      }
+    } else {
+      /* eslint no-sequences:0 */
+      reduceToObjectWith = (acc, value) => (reduceWith(acc, value), acc)
+    }
+    return this.reduce(reduceToObjectWith, initial, opts)
+  }
+  reduceToObject (reduceWith, opts) {
+    return this.reduceTo(reduceWith, {}, opts)
+  }
+  reduceToArray (reduceWith, opts) {
+    return this.reduceTo(reduceWith, [], opts)
+  }
+  sort (sortWith, opts) {
+    return fun(this.reduceToArray((acc, value) => acc.push(value)).then(values => values.sort(sortWith)))
+  }
   forEach (consumeWith, opts) {
     return new module.exports.Promise((resolve, reject) => {
-      this.once('error', reject)
       const consume = this.pipe(ConsumeStream(consumeWith, opts ? Object.assign(this.opts, opts) : this.opts))
       consume.once('error', reject)
       consume.once('finish', resolve)
@@ -80,8 +152,18 @@ class FunStream extends MiniPass {
 }
 module.exports.FunStream = FunStream
 
+class FunTransform extends Transform {
+  constructor (opts) {
+    super({objectMode: true})
+    this.opts = opts || {}
+  }
+}
+funify(FunTransform.prototype)
+
 function isAsync (fun, args, opts) {
-  return (opts && opts.async != null && opts.async) || fun.length > args
+  if (fun.constructor.name === 'AsyncFunction') return true
+  if (opts && opts.async != null) return opts.async
+  return fun.length > args
 }
 
 function FilterStream (filterWith, opts) {
@@ -92,49 +174,58 @@ function FilterStream (filterWith, opts) {
   }
 }
 
-class FilterStreamAsync extends FunStream {
-  constructor (filterWith, opts) {
-    super(opts)
-    this.filterWith = filterWith
-  }
-  write (data, _, next) {
-    const filtered = (err, result) => {
-      if (err) {
-        this.emit('error', err)
-        if (next) next(err)
-      } else if (super.write(data, null, next)) {
-        this.emit('drain')
-      }
-    }
-    const result = this.filterWith(data, filtered)
-    if (result.then) {
-      result.then(r => filtered(r), filtered)
-    }
-    return false
-  }
-  pipe (target) {
-    this.on('error', err => target.emit(err))
-    return super.pipe(target)
-  }
-}
-
-class FilterStreamSync extends FunStream {
+class FilterStreamAsync extends FunTransform {
   constructor (filterWith, opts) {
     super(opts)
     this.filters = [filterWith]
   }
-  write (data, encoding, next) {
+  _transform (data, encoding, next) {
+    this._runFilters(data, true, 0, next)
+  }
+  _runFilters (data, keep, nextFilter, next) {
+    if (!keep) return next()
+    if (nextFilter >= this.filters.length) {
+      this.push(data)
+      return next()
+    }
+    try {
+      const handleResult = (err, keep) => {
+        if (err) {
+          return next(err)
+        } else {
+          this._runFilters(data, keep, nextFilter + 1, next)
+        }
+      }
+
+      const result = this.filters[nextFilter](data, handleResult)
+      if (result && result.then) return result.then(keep => handleResult(null, keep), handleResult)
+    } catch (ex) {
+      return next(ex)
+    }
+  }
+  filter (filterWith, opts) {
+    if (isAsync(filterWith, 1, opts)) {
+      this.filters.push(filterWith)
+      return this
+    } else {
+      return super.filter(filterWith, opts)
+    }
+  }
+}
+
+class FilterStreamSync extends FunTransform {
+  constructor (filterWith, opts) {
+    super(opts)
+    this.filters = [filterWith]
+  }
+  _transform (data, encoding, next) {
     try {
       if (this.filters.every(fn => fn(data))) {
-        return super.write(data, encoding, next)
-      } else {
-        if (next) next()
-        return true
+        this.push(data, encoding)
       }
+      next()
     } catch (ex) {
-      this.emit('error', ex)
-      if (next) next(ex)
-      return false
+      next(ex)
     }
   }
   filter (filterWith, opts) {
@@ -145,54 +236,64 @@ class FilterStreamSync extends FunStream {
       return this
     }
   }
-  pipe (target) {
-    this.on('error', err => target.emit(err))
-    return super.pipe(target)
-  }
 }
 
 function MapStream (mapWith, opts) {
   if (isAsync(mapWith, 1, opts)) {
-    return new MapStreamAsync(mapWith)
+    return new MapStreamAsync(mapWith, opts)
   } else {
-    return new MapStreamSync(mapWith)
-  }
-}
-class MapStreamAsync extends FunStream {
-  constructor (mapWith) {
-    super()
-    this.mapWith = mapWith
-  }
-  write (data, encoding, next) {
-    const mapped = (err, result) => {
-      if (err) return next && next(err)
-      if (super.write(result, encoding, next)) {
-        this.emit('drain')
-      }
-    }
-    const result = this.mapWith(data, mapped)
-    if (result.then) {
-      result.then(r => mapped(r), mapped)
-    }
-    return false
-  }
-  pipe (target) {
-    this.on('error', err => target.emit(err))
-    return super.pipe(target)
+    return new MapStreamSync(mapWith, opts)
   }
 }
 
-class MapStreamSync extends FunStream {
-  constructor (mapWith) {
-    super()
+class MapStreamAsync extends FunTransform {
+  constructor (mapWith, opts) {
+    super(opts)
     this.maps = [mapWith]
   }
-  write (data, encoding, next) {
+  _transform (data, encoding, next) {
+    this._runMaps(data, 0, next)
+  }
+  _runMaps (data, nextMap, next) {
     try {
-      return super.write(this.maps.reduce((data, mapWith) => mapWith(data), data), encoding, next)
+      if (nextMap >= this.maps.length) {
+        this.push(data)
+        return next()
+      }
+      const handleResult = (err, value) => {
+        if (err) {
+          return next(err)
+        } else {
+          this._runMaps(value, nextMap + 1, next)
+        }
+      }
+      const result = this.maps[nextMap](data, handleResult)
+      if (result && result.then) return result.then(keep => handleResult(null, keep), handleResult)
     } catch (ex) {
-      this.emit('error', ex)
-      if (next) next(ex)
+      next(ex)
+    }
+  }
+  map (mapWith, opts) {
+    if (isAsync(mapWith, 1, opts)) {
+      this.maps.push(mapWith)
+      return this
+    } else {
+      return super.map(mapWith, opts)
+    }
+  }
+}
+
+class MapStreamSync extends FunTransform {
+  constructor (mapWith, opts) {
+    super(opts)
+    this.maps = [mapWith]
+  }
+  _transform (data, encoding, next) {
+    try {
+      this.push(this.maps.reduce((data, fn) => fn(data), data))
+      next()
+    } catch (ex) {
+      next(ex)
     }
   }
   map (mapWith, opts) {
@@ -203,10 +304,6 @@ class MapStreamSync extends FunStream {
       return this
     }
   }
-  pipe (target) {
-    this.on('error', err => target.emit(err))
-    return super.pipe(target)
-  }
 }
 
 function ReduceStream (reduceWith, initial, opts) {
@@ -216,29 +313,28 @@ function ReduceStream (reduceWith, initial, opts) {
     return new ReduceStreamSync(reduceWith, initial)
   }
 }
-class ReduceStreamAsync extends MiniAsyncSink {
+class ReduceStreamAsync extends Writable {
   constructor (reduceWith, initial) {
-    super()
+    super({objectMode: true})
     this.reduceWith = reduceWith
     this.acc = initial
   }
-  write (data, encoding, next) {
+  _write (data, encoding, next) {
     if (this.acc == null) {
       this.acc = data
-      return true
+      next()
     } else {
-      this.reduceWith(this.acc, data, (err, result) => {
-        if (err) return next && next(err)
+      const handleResult = (err, value) => {
         this.acc = result
-        this.emit('drain')
-        if (next) next()
-      })
-      return false
+        next(err)
+      }
+      const result = this.reduceWith(this.acc, data, handleResult)
+      if (result && result.then) return result.then(keep => handleResult(null, keep), handleResult)
     }
   }
   end () {
     super.end()
-    this.emit(result => this.acc)
+    this.emit('result', this.acc)
   }
 }
 
@@ -252,7 +348,12 @@ class ReduceStreamSync extends MiniSyncSink {
     if (this.acc == null) {
       this.acc = data
     } else {
-      this.acc = this.reduceWith(this.acc, data)
+      try {
+        this.acc = this.reduceWith(this.acc, data)
+      } catch (ex) {
+        this.emit(ex)
+        return false
+      }
     }
     if (next) next()
     return true
@@ -265,8 +366,19 @@ class ReduceStreamSync extends MiniSyncSink {
 
 function ConsumeStream (consumeWith, opts) {
   if (isAsync(consumeWith, 1, opts)) {
-    return new MiniAsyncSink({write: consumeWith})
+    return new ConsumeStreamAsync({consumeWith: consumeWith})
   } else {
     return new MiniSyncSink({write: consumeWith})
+  }
+}
+
+class ConsumeStreamAsync extends Writable {
+  constructor (opts) {
+    super({objectMode: true})
+    this.consumeWith = opts.consumeWith
+  }
+  _write (data, encoding, next) {
+    const result = this.consumeWith(data, next)
+    if (result && result.then) return result.then(keep => next(null, keep), next)
   }
 }
