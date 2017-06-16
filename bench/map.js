@@ -31,12 +31,10 @@ class Numbers extends stream.Readable {
     while (flowing) {
       if (++this.ii >= 1000) {
         return this.push(null)
-        return
       } else {
         flowing = this.push(this.acc += this.ii)
       }
     }
-    return
   }
 }
 module.exports = suite => {
@@ -105,7 +103,6 @@ module.exports = suite => {
     }
   })
 
-
   suite.add('stream.Transform', {
     defer: true,
     fn (deferred) {
@@ -168,7 +165,7 @@ module.exports = suite => {
       const out = new NullSink()
       out.on('finish', () => deferred.resolve())
       out.on('error', err => deferred.resolve(console.error('ERR', err)))
-      fun(new Numbers()).async().map(async n => await n + 1).map(async n => await n % 2).map(async n => await `${n}\n`).pipe(out)
+      fun(new Numbers()).async().map(async n => n + 1).map(async n => n % 2).map(async n => `${n}\n`).pipe(out)
     }
   })
 
