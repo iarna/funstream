@@ -1,11 +1,12 @@
 'use strict'
 const INIT = Symbol('init')
 const OPTS = Symbol('opts')
+const ISFUN = Symbol('isFun')
 
 class FunStream {
   [INIT] (opts) {
     this[OPTS] = opts || {}
-    this.isFun = true
+    this[ISFUN] = true
   }
   async () {
     this[OPTS].async = true
@@ -74,7 +75,7 @@ class FunStream {
   }
 }
 
-FunStream.isFun = stream => Boolean(stream.isFun)
+FunStream.isFun = stream => Boolean(stream[ISFUN])
 FunStream.mixin = mixinFun
 FunStream.isAsync = isAsync
 
