@@ -7,6 +7,6 @@ class FunTransform extends Transform {
     FunTransform.funInit.call(this, opts)
   }
 }
-FunStream.mixin(FunTransform.prototype)
+FunStream.mixin(FunTransform)
 
 module.exports = FunTransform
