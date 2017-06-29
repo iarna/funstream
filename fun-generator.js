@@ -3,7 +3,6 @@ const Readable = require('stream').Readable
 const FunStream = require('./fun-stream.js')
 
 const ITER = Symbol('iter')
-const NEXT = Symbol('next')
 
 class FunGenerator extends Readable {
   constructor (iter, opts) {
