@@ -17,18 +17,18 @@
     "through2": "^2.0.3"
   },
   "files": [
-    "index.js",
-    "fun-stream.js",
+    "filter-stream.js",
+    "for-each-stream.js",
     "fun-array.js",
+    "fun-generator.js",
     "fun-passthrough.js",
     "fun-stream.js",
     "fun-transform.js",
-    "filter-stream.js",
+    "index.js",
     "map-stream.js",
-    "reduce-stream.js",
-    "for-each-stream.js",
     "mini-sync-sink.js",
-    "null-sink.js"
+    "null-sink.js",
+    "reduce-stream.js"
   ],
   "directories": {
     "test": "test"
