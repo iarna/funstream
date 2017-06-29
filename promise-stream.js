@@ -1,6 +1,6 @@
 'use strict'
 module.exports = mixinPromise
-const PROMISE = Symbol('Promise')
+const PROMISE = Symbol('promise')
 const MAKEPROMISE = Symbol('makePromise')
 
 function mixinPromise (Promise, stream) {
@@ -27,7 +27,7 @@ function mixinPromise (Promise, stream) {
     }
   }
   // and everything else, iterating prototype doesn't
-  // work on builtin promises.
+  // work on builtin promises, thus the hard coded list above.
   for (let name in Promise.prototype) {
     if (name[0] === '_') continue
     if (name in obj) continue
