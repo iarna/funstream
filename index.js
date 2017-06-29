@@ -1,10 +1,11 @@
 'use strict'
+module.exports = fun
+
 const FunPassThrough = require('./fun-passthrough.js')
 const FunArray = require('./fun-array.js')
 const FunGenerator = require('./fun-generator.js')
 
-module.exports = fun
-module.exports.FunStream = FunPassThrough
+fun.FunStream = FunPassThrough
 
 try {
   module.exports.Promise = require('bluebird')
