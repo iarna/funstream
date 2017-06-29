@@ -70,7 +70,7 @@ class FunStream {
   }
 }
 
-FunStream.isFun = stream => Boolean(stream[ISFUN])
+FunStream.isFun = stream => Boolean(stream && stream[ISFUN])
 FunStream.mixin = mixinFun
 FunStream.isAsync = isAsync
 
