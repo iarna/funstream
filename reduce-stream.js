@@ -33,8 +33,8 @@ class ReduceStreamAsync extends Writable {
     }
   }
   end () {
-    super.end()
     this.emit('result', this.acc)
+    super.end()
   }
 }
 
@@ -59,7 +59,7 @@ class ReduceStreamSync extends MiniSyncSink {
     return true
   }
   end () {
-    super.end()
     this.emit('result', this.acc)
+    super.end()
   }
 }
