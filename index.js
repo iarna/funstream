@@ -31,7 +31,7 @@ function fun (stream, opts) {
       return stream // write streams can't be fun
     }
     if ('then' in stream) { // promises of fun
-      const resultStream = new FunPassThrough()
+      const resultStream = new FunPassThrough(Object.assign({Promise: fun.Promise}, opts || {}))
       stream.then(promised => {
         const srcStream = fun(promised)
         return FunPassThrough.isFun(srcStream) ? srcStream.pipe(resultStream) : resultStream.pipe(srcStream)
