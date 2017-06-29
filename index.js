@@ -4,6 +4,7 @@ module.exports = fun
 const FunPassThrough = require('./fun-passthrough.js')
 const FunArray = require('./fun-array.js')
 const FunGenerator = require('./fun-generator.js')
+const mixinPromiseStream = require('./promise-stream.js')
 
 fun.FunStream = FunPassThrough
 
@@ -28,7 +29,8 @@ function fun (stream, opts) {
       return FunPassThrough.mixin(stream, Object.assign({Promise: fun.Promise}, opts || {}))
     }
     if ('write' in stream) {
-      return stream // write streams can't be fun
+      const P = (opts && opts.Promise) || fun.Promise
+      return mixinPromiseStream(P, stream)
     }
     if ('then' in stream) { // promises of fun
       const resultStream = new FunPassThrough(Object.assign({Promise: fun.Promise}, opts || {}))

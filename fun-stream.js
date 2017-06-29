@@ -37,11 +37,7 @@ class FunStream {
   }
   reduce (reduceWith, initial, reduceOpts) {
     const opts = Object.assign({}, this[OPTS], reduceOpts || {})
-    return new opts.Promise((resolve, reject) => {
-      const reduce = this.pipe(ReduceStream(reduceWith, initial, opts))
-      reduce.once('error', reject)
-      reduce.once('result', resolve)
-    })
+    return this.pipe(ReduceStream(reduceWith, initial, opts))
   }
   reduceTo (reduceWith, initial, reduceOpts) {
     const opts = Object.assign({}, this[OPTS], reduceOpts || {})
@@ -70,11 +66,7 @@ class FunStream {
   }
   forEach (foreachWith, forEachOpts) {
     const opts = Object.assign({}, this[OPTS], forEachOpts || {})
-    return new opts.Promise((resolve, reject) => {
-      const foreach = this.pipe(ForEachStream(foreachWith, opts))
-      foreach.once('error', reject)
-      foreach.once('finish', resolve)
-    })
+    return this.pipe(ForEachStream(foreachWith, opts))
   }
 }
 

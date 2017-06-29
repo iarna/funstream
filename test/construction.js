@@ -36,6 +36,7 @@ test('construction', t => {
   t.is(FunStream.isFun(writableFun), false, 'fun(Writable) is NOT fun')
   t.is(typeof writableFun.pause, 'undefined', 'fun(Writable) is NOT readable')
   t.is(typeof writableFun.write, 'function', 'fun(Writable) is writable')
+  t.is(typeof writableFun.then, 'function', 'fun(Writable) is thenable')
 
   t.throws(() => {
     fun(123)
@@ -74,6 +75,7 @@ test('promised construction', t => {
   t.is(FunStream.isFun(writableFun), true, "Promised fun(Writable) is fun (because we don't know any better)")
   t.is(typeof writableFun.pause, 'function', "Promised fun(Writable) is readable (because we don't know any better)")
   t.is(typeof writableFun.write, 'function', 'Promised fun(Writable) is writable')
+  t.is(typeof writableFun.then, 'undefined', 'Promised fun(Writable) is NOT thenable (because we do not know any better)')
 
   t.test("fun won't fun just anything", t => {
     t.plan(1)
