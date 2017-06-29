@@ -29,7 +29,8 @@ function mixinPromise (Promise, stream) {
   // and everything else, iterating prototype doesn't
   // work on builtin promises.
   for (let name in Promise.prototype) {
-    if (name[0] === '_' || name === 'then' || name === 'catch') continue
+    if (name[0] === '_') continue
+    if (name in obj) continue
     let func = Promise.prototype[name]
     obj[name] = function () {
       if (!this[PROMISE]) this[MAKEPROMISE]()
