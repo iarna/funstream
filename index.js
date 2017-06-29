@@ -1,6 +1,7 @@
 'use strict'
 const FunPassThrough = require('./fun-passthrough.js')
 const FunArray = require('./fun-array.js')
+const FunGenerator = require('./fun-generator.js')
 
 module.exports = fun
 module.exports.FunStream = FunPassThrough
@@ -19,6 +20,9 @@ function fun (stream, opts) {
     return new FunArray(stream, Object.assign({Promise: module.exports.Promise}, opts || {}))
   }
   if (typeof stream === 'object') {
+    if (Symbol.iterator in stream) {
+      return new FunGenerator(stream, Object.assign({Promise: module.exports.Promise}, opts || {}))
+    }
     if ('pause' in stream) {
       return FunPassThrough.mixin(stream, Object.assign({Promise: module.exports.Promise}, opts || {}))
     }
