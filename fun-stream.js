@@ -17,7 +17,10 @@ class FunStream {
     return this
   }
   pipe (into, opts) {
-    this.on('error', (err, stream) => into.emit('error', err, stream || this))
+    this.on('error', err => {
+      if (err.src === undefined) err.src = this
+      into.emit('error', err)
+    })
     return mixinFun(super.pipe(into, opts), this[OPTS])
   }
   filter (filterWith, opts) {
@@ -114,7 +117,10 @@ function mixinFun (stream, opts) {
 
   const originalPipe = obj.pipe
   obj.pipe = function (into, opts) {
-    this.on('error', (err, stream) => into.emit('error', err, stream || this))
+    this.on('error', err => {
+      if (err.src === undefined) err.src = this
+      into.emit('error', err)
+    })
     return mixinFun(originalPipe.call(this, into, opts), this[OPTS])
   }
   return obj
