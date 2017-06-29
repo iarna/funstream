@@ -5,7 +5,7 @@ const ISFUN = Symbol('isFun')
 
 class FunStream {
   [INIT] (opts) {
-    this[OPTS] = opts || {}
+    this[OPTS] = Object.assign({Promise: Promise}, opts || {})
     this[ISFUN] = true
   }
   async () {
