@@ -11,7 +11,9 @@ function mixinPromise (Promise, stream) {
 
   obj[MAKEPROMISE] = function () {
     this[PROMISE] = new Promise((resolve, reject) => {
-      this.once('finish', resolve)
+      this.once('result', resolve)
+      // finish should always lose any race w/ result
+      this.once('finish', () => setImmediate(resolve))
       this.once('error', reject)
     })
   }
