@@ -53,10 +53,28 @@ explicitly pass in `async: true`.
 Returns a funstream that will receive entries from the array one at a time
 while respecting back pressure.
 
+### fun(generator[,opts]) → FunStream
+
+Returns a funstream that will receive values from the generator one at a time
+while respecting back pressure.
+
 ### fun([opts]) → FunStream
 
 Make a passthrough Funstream.  You can pipe into this to get access to our
 handy methods.
+
+### fun.FunStream
+
+Exactly the same as `stream.PassThrough` but with fun added.  `fun()` is
+mostly the same as `new fun.FunStream()`.  (The former will use Bluebird for
+promises if available but fallback to system promsies.  The latter has no
+magic and just uses system promises.)
+
+### require('funstream/fun-stream').mixin
+
+The core extension mechanism (otherwise unneeded).  It adds fun to an
+existing class or object. Classes that have fun mixed in need to also call
+`FunPassThrough.funInit.call(this, opts)` in their constructors.
 
 ## Funstream and Pipelines
 
