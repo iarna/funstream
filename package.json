@@ -27,7 +27,6 @@
     "index.js",
     "map-stream.js",
     "mini-sync-sink.js",
-    "null-sink.js",
     "promise-stream.js",
     "reduce-stream.js"
   ],
