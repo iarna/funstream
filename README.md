@@ -18,23 +18,51 @@ fun([1, 2, 3, 4, 5])
   .then(console.log)
 // prints 8
 
+// `fun()` takes all sorts of arguments…
+// readable streams…
+fun(process.stdin)
+// Promised streams…
+fun(fetch('https://example.com').then(r => r.body))
+// generators…
+function * mygen () {
+  for (let ii = 0; ii < 10000; ++ii) {
+    yield ii
+  }
+}
+fun(mygen())
+// arrays
+fun([1, 2, 3, 4])
+// writable streams are promises
+fun(writestream)
+  .then(() => console.log('finished!'))
+  .catch(err => console.error('stream error', err)
+// writable streams are streams AND promises
+process.stdin.pipe(fun(writestream))
+  .then(() => console.log('done!'))
+
 // If you're not so keen on mutating things, why not try piping into a piping hot fun stream?
 process.stdin.pipe(fun())
   .map(str => transformStr(str))
   .pipe(process.stdout)
 
-// You'll also transparently use async functions, so like if `transformStr` is async then you can use:
- .map(async str => transformStr(str))
-// Just make sure you don't forget the async keyword.  Alternatively, you
-// can use the async method in the chain:
- .async().map(str => transformStr(str))
+// Fun functions can be sync…
+.map(str => str.slice(10))
+
+// Fun functions can be async…
+.map(async str => (await transformStr(str)).slice(10))
+
+// Fun functions can be promise returning…
+.map(str => transformStr(str))
+
+// Fun functions can be callback using…
+.async().map((str, cb) => transformStrCB(str, cb))
 ```
 
 Funstream makes object streams better.
 
 ## Funstream constructors
 
-### fun(stream[, opts]) → FunStream
+### fun(readableStream[, opts]) → FunStream
 
 This is probably what you want.
 
@@ -47,6 +75,17 @@ async. If you don't include this we'll detect which you're using by looking
 at the number of arguments your callback takes. Because promises and sync functions
 take the same number of arguments, if you're using promise returning callbacks you'll need to
 explicitly pass in `async: true`.
+
+### fun(writableStream[, opts]) → PromiseStream
+
+Writable streams can't be fun per se, since being fun means having
+iterators.  But they can at least promise their results.  If you make a
+writable stream fun then you'll get a stream/promise hybrid.  All the power
+of a stream, but with the promise methods of your favorite promise
+implmenetation.  The promise will Resolve when the stream finishes and
+Reject if it errors.
+
+This is how `reduce` and `forEach` get their return values.
 
 ### fun(array[,opts]) → FunStream
 
@@ -158,7 +197,7 @@ fun(stream)
   .sort((a, b) => a.localeCompare(b))
 ```
 
-### .reduce(reduceWith[, initial[, opts]]) → Promise
+### .reduce(reduceWith[, initial[, opts]]) → PromiseStream
 
 Promise the result of computing everything.
 
@@ -173,7 +212,11 @@ fun(stream)
   .then(wholeThing => { … })
 ```
 
-### .reduceToArray(reduceWith, opts) → Promise
+The return value is _also_ a stream, so you can hang the usual event
+listeneners off it.  Reduce streams emit a `result` event just before
+`finish` with the final value of the accumulator in the reduce.
+
+### .reduceToArray(reduceWith, opts) → PromiseStream
 
 Promise the result of reducing into an array.  Handy when you want to push
 on to an array without worrying about your return value. This is sugar for:
@@ -181,10 +224,9 @@ on to an array without worrying about your return value. This is sugar for:
 ```
 fun(stream)
   .reduce((acc, value) => { reduceWith(acc, value) ; return acc }, [])
-
 ```
 
-### .reduceToArray(reduceWith, opts) → Promise
+### .reduceToArray(reduceWith, opts) → PromiseStream
 
 Promise the result of reducing into an array. Handy when you want to build
 an object without worrying about your return values. This is sugar for:
@@ -194,7 +236,7 @@ fun(stream)
   .reduce((acc, value) => { reduceWith(acc, value) ; return acc }, {})
 ```
 
-### .forEach(consumeWith[, opts]) → Promise
+### .forEach(consumeWith[, opts]) → PromiseStream
 
 Run some code for every chunk, promise that the stream is done.
 
@@ -204,6 +246,9 @@ fun(stream)
   .forEach(chunk => console.log(chunk)
   .then(() => console.log('Done!'))
 ```
+
+As with reduce streams the return value from `forEach` is  both a promise
+and a stream.
 
 ## Benchmarks
 
