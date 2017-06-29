@@ -19,7 +19,7 @@ class FunGenerator extends Readable {
       } catch (ex) {
         this.emit('error', ex)
         return
-     }
+      }
     }
   }
 }
