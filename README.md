@@ -254,6 +254,10 @@ const data = await fun().map(…).filter(…).list()
 
 It's just sugar for: `reduceToArray((acc, val) => acc.push(val), opts)`
 
+### .concat(opts) → FunStream
+
+Promise a string produced by concatenating all of the values in the stream
+
 ### .reduce(reduceWith[, initial[, opts]]) → PromiseStream
 
 Promise the result of computing everything.

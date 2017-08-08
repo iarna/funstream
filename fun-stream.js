@@ -77,6 +77,9 @@ class FunStream {
   sort (sortWith, opts) {
     return this.grab(v => v.sort(sortWith))
   }
+  concat (opts) {
+    return this.reduce((acc, val) => acc + val, '', opts)
+  }
   forEach (foreachWith, forEachOpts) {
     const opts = Object.assign({}, this[OPTS], forEachOpts || {})
     return this.pipe(ForEachStream(foreachWith, opts))
@@ -117,6 +120,7 @@ function mixinFun (stream, opts) {
   obj.reduceTo = FunStream.prototype.reduceTo
   obj.reduceToArray = FunStream.prototype.reduceToArray
   obj.reduceToObject = FunStream.prototype.reduceToObject
+  obj.concat = FunStream.prototype.concat
   obj.list = FunStream.prototype.list
   obj.grab = FunStream.prototype.grab
   obj.sort = FunStream.prototype.sort
@@ -134,7 +138,6 @@ function mixinFun (stream, opts) {
   }
   return obj
 }
-
 module.exports = FunStream
 
 var FilterStream = require('./filter-stream.js')
