@@ -31,6 +31,13 @@ class FunStream {
     const map = MapStream(mapWith, opts ? Object.assign(this[OPTS], opts) : this[OPTS])
     return this.pipe(map)
   }
+  flat (opts) {
+    return this.flatMap(v => v, opts)
+  }
+  flatMap (mapWith, opts) {
+    const map = FlatMapStream(mapWith, opts ? Object.assign(this[OPTS], opts) : this[OPTS])
+    return this.pipe(map)
+  }
   head (maxoutput) {
     let seen = 0
     return this.filter(() => seen++ < maxoutput)
@@ -97,6 +104,8 @@ function mixinFun (stream, opts) {
 
   obj.filter = FunStream.prototype.filter
   obj.map = FunStream.prototype.map
+  obj.flat = FunStream.prototype.flat
+  obj.flatMap = FunStream.prototype.flatMap
   obj.head = FunStream.prototype.head
   obj.reduce = FunStream.prototype.reduce
   obj.reduceTo = FunStream.prototype.reduceTo
@@ -122,6 +131,7 @@ module.exports = FunStream
 
 var FilterStream = require('./filter-stream.js')
 var MapStream = require('./map-stream.js')
+var FlatMapStream = require('./flat-map-stream.js')
 var ReduceStream = require('./reduce-stream.js')
 var ForEachStream = require('./for-each-stream.js')
 var fun = require('./index.js')

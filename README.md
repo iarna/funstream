@@ -179,6 +179,33 @@ Transform the stream!
 
 `data` is replaced with `newData` from `mapWith` in the output stream.
 
+### .flat([, opts]) → FunStream
+
+Flattens arrays in the streams into object emissions! That is to say, a stream of two objects:
+
+```js
+[1, 2, 3], [23, 42, 57]
+```
+
+Will become a stream of six objects:
+
+```js
+1, 2, 3, 23, 42, 57
+```
+
+This is implemented as `flatMap(v => v, opts)`
+
+### .flatMap([, opts]) → FunStream
+
+Transform all the stream elements and flatten any return values.  This is
+the equivalent of:
+
+```js
+map(…).flat()
+```
+
+Only without mutiple phases.
+
 ### .sort(sortWith, opts) → FunStream
 
 WARNING: This has to load all of your content into memory in order to sort
