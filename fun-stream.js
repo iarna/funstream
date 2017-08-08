@@ -89,6 +89,7 @@ class FunStream {
 FunStream.isFun = stream => Boolean(stream && stream[ISFUN])
 FunStream.mixin = mixinFun
 FunStream.isAsync = isAsync
+FunStream.OPTS = OPTS
 
 function isAsync (fun, args, opts) {
   if (fun.constructor.name === 'AsyncFunction') return true
