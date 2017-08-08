@@ -80,9 +80,9 @@ class FunStream {
   concat (opts) {
     return this.reduce((acc, val) => acc + val, '', opts)
   }
-  forEach (foreachWith, forEachOpts) {
+  forEach (forEachWith, forEachOpts) {
     const opts = Object.assign({}, this[OPTS], forEachOpts || {})
-    return this.pipe(ForEachStream(foreachWith, opts))
+    return this.pipe(ForEachStream(forEachWith, opts))
   }
 }
 
