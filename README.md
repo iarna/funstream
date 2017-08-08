@@ -2,7 +2,7 @@
 
 Funstream gives you iteratorish methods on your streams.
 
-```
+```js
 const fun = require('funstream')
 
 fun([1, 2, 3, 4, 5])
@@ -151,7 +151,7 @@ Will only foward the first `numberOfItems` down stream.  The remainder are
 ignored.  At the moment this does not end the stream after the
 `numberOfItems` limit is hit, but in future it likely will.
 
-```
+```js
 fun(stream)
   .head(5)
   .forEach(item => { // only sees the first five items regardless of how long the stream is.
@@ -267,7 +267,7 @@ Promise the result of computing everything.
 * `reduceWith(acc, value) → Promise(acc)
 
 Concat a stream:
-```
+```js
 fun(stream)
   .reduce((acc, value) => acc + value)
   .then(wholeThing => { … })
@@ -282,7 +282,7 @@ listeneners off it.  Reduce streams emit a `result` event just before
 Promise the result of reducing into an array.  Handy when you want to push
 on to an array without worrying about your return value. This is sugar for:
 
-```
+```js
 fun(stream)
   .reduce((acc, value) => { reduceWith(acc, value) ; return acc }, [])
 ```
@@ -292,7 +292,7 @@ fun(stream)
 Promise the result of reducing into an array. Handy when you want to build
 an object without worrying about your return values. This is sugar for:
 
-```
+```js
 fun(stream)
   .reduce((acc, value) => { reduceWith(acc, value) ; return acc }, {})
 ```
@@ -302,7 +302,7 @@ fun(stream)
 Run some code for every chunk, promise that the stream is done.
 
 Example, print each line:
-```
+```js
 fun(stream)
   .forEach(chunk => console.log(chunk)
   .then(() => console.log('Done!'))
