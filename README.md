@@ -212,8 +212,8 @@ WARNING: This has to load all of your content into memory in order to sort
 it, so be sure to do your filtering or limiting (with `.head`) before you
 call this. This results in a funstream fed from the sorted array.
 
-At the moment `sortWith` must be synchronous (as it's ultimately passed to
-`Array.sort`).  That will likely change in the future.
+`sortWith` must be synchronous (as it's ultimately passed to
+`Array.sort`).
 
 * `sortWith(a, b) → -1 | 0 | 1` – It's the usual sort comparison function, per `Array.sort`.
 
