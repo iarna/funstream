@@ -219,10 +219,40 @@ At the moment `sortWith` must be synchronous (as it's ultimately passed to
 
 Sort a stream alphabetically:
 
-```
+```js
 fun(stream)
   .sort((a, b) => a.localeCompare(b))
 ```
+
+### .grab(grabWith, opts) → FunStream
+
+WARNING: This has to load all of your content into memory in order to sort
+it, so be sure to do your filtering or limiting (with `.head`) before you
+call this. This results in a funstream fed from the sorted array.
+
+`grabWith` is a synchronous funciton.  It accepts the entire stream as an
+array as an argument and turns the return value into a stream with `fun()`.
+
+For example, sort can be implemented as:
+
+```js
+function sortStream (st) {
+  return st.grab(v => v.sort(sortWith))
+}
+```
+
+It makes it easy to apply array verbs to a stream that aren't otherwise
+supported but it does mean loading the entire stream into memory.
+
+### .list(opts) → FunStream
+
+Promise an array of all of the values in the stream. Let's you do things like…
+
+```js
+const data = await fun().map(…).filter(…).list()
+```
+
+It's just sugar for: `reduceToArray((acc, val) => acc.push(val), opts)`
 
 ### .reduce(reduceWith[, initial[, opts]]) → PromiseStream
 

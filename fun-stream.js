@@ -68,8 +68,14 @@ class FunStream {
   reduceToArray (reduceWith, opts) {
     return this.reduceTo(reduceWith, [], opts)
   }
+  list (opts) {
+    return this.reduceToArray((acc, val) => acc.push(val), opts)
+  }
+  grab (whenDone, opts) {
+    return fun(this.list().then(v => whenDone(v)))
+  }
   sort (sortWith, opts) {
-    return fun(this.reduceToArray((acc, value) => acc.push(value)).then(values => values.sort(sortWith)))
+    return this.grab(v => v.sort(sortWith))
   }
   forEach (foreachWith, forEachOpts) {
     const opts = Object.assign({}, this[OPTS], forEachOpts || {})
@@ -111,6 +117,8 @@ function mixinFun (stream, opts) {
   obj.reduceTo = FunStream.prototype.reduceTo
   obj.reduceToArray = FunStream.prototype.reduceToArray
   obj.reduceToObject = FunStream.prototype.reduceToObject
+  obj.list = FunStream.prototype.list
+  obj.grab = FunStream.prototype.grab
   obj.sort = FunStream.prototype.sort
   obj.forEach = FunStream.prototype.forEach
   obj.sync = FunStream.prototype.sync
