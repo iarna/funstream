@@ -9,13 +9,42 @@ function mixinPromise (Promise, stream) {
 
   if (MAKEPROMISE in obj) return stream
 
-  obj[MAKEPROMISE] = function () {
-    this[PROMISE] = new Promise((resolve, reject) => {
-      this.once('result', resolve)
-      // finish should always lose any race w/ result
-      this.once('finish', () => setImmediate(resolve))
-      this.once('error', reject)
-    })
+  let error
+  obj.once('error', err => { error = err })
+  if ('write' in stream) {
+    let finished = false
+    let result
+    obj.once('result', value => { result = value })
+    obj.once('finish', () => setImmediate(() => { finished = true }))
+    obj[MAKEPROMISE] = function () {
+      if (error) {
+        this[PROMISE] = Promise.reject(error)
+      } else if (result || finished) {
+        this[PROMISE] = Promise.resolve(result)
+      } else {
+        this[PROMISE] = new Promise((resolve, reject) => {
+          this.once('result', resolve)
+          // finish should always lose any race w/ result
+          this.once('finish', () => setImmediate(resolve))
+          this.once('error', reject)
+        })
+      }
+    }
+  } else {
+    let ended = false
+    obj.once('end', () => { ended = true })
+    obj[MAKEPROMISE] = function () {
+      if (error) {
+        this[PROMISE] = Promise.reject(error)
+      } else if (ended) {
+        this[PROMISE] = Promise.resolve()
+      } else {
+        this[PROMISE] = new Promise((resolve, reject) => {
+          this.once('end', resolve)
+          this.once('error', reject)
+        })
+      }
+    }
   }
 
   // the core interface
