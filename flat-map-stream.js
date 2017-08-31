@@ -1,12 +1,13 @@
 'use strict'
-const FunStream = require('./fun-stream.js')
 const FunTransform = require('./fun-transform.js')
+let FunStream
 
 module.exports = FlatMapStream
 
 const MAP = Symbol('map')
 
 function FlatMapStream (mapWith, opts) {
+  if (!FunStream) FunStream = require('./fun-stream.js')
   if (FunStream.isAsync(mapWith, 1, opts)) {
     return new FlatMapStreamAsync(mapWith, opts)
   } else {

@@ -1,12 +1,21 @@
 'use strict'
 module.exports = fun
 
-const FunPassThrough = require('./fun-passthrough.js')
-const FunArray = require('./fun-array.js')
-const FunGenerator = require('./fun-generator.js')
-const mixinPromiseStream = require('./promise-stream.js')
+let FunPassThrough
+let FunArray
+let FunGenerator
+let mixinPromiseStream
 
-fun.FunStream = FunPassThrough
+Object.defineProperty(fun, 'FunStream', {
+  enumerable: true,
+  configurable: true,
+  get () {
+    if (!FunPassThrough) FunPassThrough = require('./fun-passthrough.js')
+    delete fun.FunStream
+    fun.FunStream = FunPassThrough
+    return FunPassThrough
+  }
+})
 
 try {
   fun.Promise = require('bluebird')
@@ -16,31 +25,34 @@ try {
 
 function fun (stream, opts) {
   if (stream == null) {
+    if (!FunPassThrough) FunPassThrough = require('./fun-passthrough.js')
     return new FunPassThrough(Object.assign({Promise: fun.Promise}, opts || {}))
   }
   if (Array.isArray(stream)) {
+    if (!FunArray) FunArray = require('./fun-array.js')
     return new FunArray(stream, Object.assign({Promise: fun.Promise}, opts || {}))
   }
   if (typeof stream === 'object') {
     if (Symbol.iterator in stream) {
+      if (!FunGenerator) FunGenerator = require('./fun-generator.js')
       return new FunGenerator(stream, Object.assign({Promise: fun.Promise}, opts || {}))
-    }
-    if ('pause' in stream) {
+    } else if ('pause' in stream) {
+      if (!FunPassThrough) FunPassThrough = require('./fun-passthrough.js')
       return FunPassThrough.mixin(stream, Object.assign({Promise: fun.Promise}, opts || {}))
-    }
-    if ('write' in stream) {
+    } else if ('write' in stream) {
+      if (!mixinPromiseStream) mixinPromiseStream = require('./promise-stream.js')
       const P = (opts && opts.Promise) || fun.Promise
       return mixinPromiseStream(P, stream)
-    }
-    if ('then' in stream) { // promises of fun
+    } else if ('then' in stream) { // promises of fun
+      if (!FunPassThrough) FunPassThrough = require('./fun-passthrough.js')
       const resultStream = new FunPassThrough(Object.assign({Promise: fun.Promise}, opts || {}))
       stream.then(promised => {
         const srcStream = fun(promised)
         return FunPassThrough.isFun(srcStream) ? srcStream.pipe(resultStream) : resultStream.pipe(srcStream)
       }).catch(err => resultStream.emit('error', err))
       return resultStream
-    }
-    if (opts == null) {
+    } else if (opts == null) {
+      if (!FunPassThrough) FunPassThrough = require('./fun-passthrough.js')
       return new FunPassThrough(Object.assign({Promise: fun.Promise}, stream))
     }
   }

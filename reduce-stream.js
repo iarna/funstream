@@ -1,11 +1,12 @@
 'use strict'
 const Writable = require('stream').Writable
 const MiniSyncSink = require('./mini-sync-sink')
-const FunStream = require('./fun-stream.js')
+let FunStream
 
 module.exports = ReduceStream
 
 function ReduceStream (reduceWith, initial, opts) {
+  FunStream = require('./fun-stream.js')
   if (FunStream.isAsync(reduceWith, 2, opts)) {
     return new ReduceStreamAsync(reduceWith, initial)
   } else {

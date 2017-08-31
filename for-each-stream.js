@@ -1,14 +1,16 @@
 'use strict'
 const Writable = require('stream').Writable
-const MiniSyncSink = require('./mini-sync-sink')
-const FunStream = require('./fun-stream.js')
+let MiniSyncSink
+let FunStream
 
 module.exports = ForEachStream
 
 function ForEachStream (consumeWith, opts) {
+  if (!FunStream) FunStream = require('./fun-stream.js')
   if (FunStream.isAsync(consumeWith, 1, opts)) {
     return new ForEachStreamAsync({consumeWith: consumeWith})
   } else {
+    if (!MiniSyncSink) MiniSyncSink = require('./mini-sync-sink.js')
     return new MiniSyncSink({write: consumeWith})
   }
 }

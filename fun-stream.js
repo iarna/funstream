@@ -1,7 +1,13 @@
 'use strict'
+const fun = require('./index.js')
 const INIT = Symbol('init')
 const OPTS = Symbol('opts')
 const ISFUN = Symbol('isFun')
+let FilterStream
+let MapStream
+let FlatMapStream
+let ReduceStream
+let ForEachStream
 
 class FunStream {
   [INIT] (opts) {
@@ -24,10 +30,12 @@ class FunStream {
     return fun(super.pipe(into, opts), this[OPTS])
   }
   filter (filterWith, opts) {
+    if (!FilterStream) FilterStream = require('./filter-stream.js')
     const filter = FilterStream(filterWith, opts ? Object.assign(this[OPTS], opts) : this[OPTS])
     return this.pipe(filter)
   }
   map (mapWith, opts) {
+    if (!MapStream) MapStream = require('./map-stream.js')
     const map = MapStream(mapWith, opts ? Object.assign(this[OPTS], opts) : this[OPTS])
     return this.pipe(map)
   }
@@ -35,6 +43,7 @@ class FunStream {
     return this.flatMap(v => v, opts)
   }
   flatMap (mapWith, opts) {
+    if (!FlatMapStream) FlatMapStream = require('./flat-map-stream.js')
     const map = FlatMapStream(mapWith, opts ? Object.assign(this[OPTS], opts) : this[OPTS])
     return this.pipe(map)
   }
@@ -43,6 +52,7 @@ class FunStream {
     return this.filter(() => seen++ < maxoutput)
   }
   reduce (reduceWith, initial, reduceOpts) {
+    if (!ReduceStream) ReduceStream = require('./reduce-stream.js')
     const opts = Object.assign({}, this[OPTS], reduceOpts || {})
     return this.pipe(ReduceStream(reduceWith, initial, opts))
   }
@@ -81,6 +91,7 @@ class FunStream {
     return this.reduce((acc, val) => acc + val, '', opts)
   }
   forEach (forEachWith, forEachOpts) {
+    if (!ForEachStream) ForEachStream = require('./for-each-stream.js')
     const opts = Object.assign({}, this[OPTS], forEachOpts || {})
     return this.pipe(ForEachStream(forEachWith, opts))
   }
@@ -141,9 +152,3 @@ function mixinFun (stream, opts) {
 }
 module.exports = FunStream
 
-var FilterStream = require('./filter-stream.js')
-var MapStream = require('./map-stream.js')
-var FlatMapStream = require('./flat-map-stream.js')
-var ReduceStream = require('./reduce-stream.js')
-var ForEachStream = require('./for-each-stream.js')
-var fun = require('./index.js')

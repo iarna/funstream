@@ -1,10 +1,11 @@
 'use strict'
-const FunStream = require('./fun-stream.js')
 const FunTransform = require('./fun-transform.js')
+let FunStream
 
 module.exports = FilterStream
 
 function FilterStream (filterWith, opts) {
+  if (!FunStream) FunStream = require('./fun-stream.js')
   if (FunStream.isAsync(filterWith, 1, opts)) {
     return new FilterStreamAsync(filterWith, opts)
   } else {
@@ -42,6 +43,7 @@ class FilterStreamAsync extends FunTransform {
     }
   }
   filter (filterWith, opts) {
+    if (!FunStream) FunStream = require('./fun-stream.js')
     if (FunStream.isAsync(filterWith, 1, opts)) {
       this.filters.push(filterWith)
       return this
@@ -67,6 +69,7 @@ class FilterStreamSync extends FunTransform {
     }
   }
   filter (filterWith, opts) {
+    if (!FunStream) FunStream = require('./fun-stream.js')
     if (FunStream.isAsync(filterWith, 1, opts)) {
       return super.filter(filterWith, opts)
     } else {

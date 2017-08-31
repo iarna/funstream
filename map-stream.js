@@ -1,5 +1,5 @@
 'use strict'
-const FunStream = require('./fun-stream.js')
+let FunStream
 const FunTransform = require('./fun-transform.js')
 
 module.exports = MapStream
@@ -7,6 +7,7 @@ module.exports = MapStream
 const MAPS = Symbol('maps')
 
 function MapStream (mapWith, opts) {
+  if (!FunStream) FunStream = require('./fun-stream.js')
   if (FunStream.isAsync(mapWith, 1, opts)) {
     return new MapStreamAsync(mapWith, opts)
   } else {
@@ -42,6 +43,7 @@ class MapStreamAsync extends FunTransform {
     }
   }
   map (mapWith, opts) {
+    if (!FunStream) FunStream = require('./fun-stream.js')
     if (FunStream.isAsync(mapWith, 1, opts)) {
       this[MAPS].push(mapWith)
       return this
@@ -65,6 +67,7 @@ class MapStreamSync extends FunTransform {
     }
   }
   map (mapWith, opts) {
+    if (!FunStream) FunStream = require('./fun-stream.js')
     if (FunStream.isAsync(mapWith, 1, opts)) {
       return super.map(mapWith, opts)
     } else {
