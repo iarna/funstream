@@ -76,7 +76,7 @@ at the number of arguments your callback takes. Because promises and sync functi
 take the same number of arguments, if you're using promise returning callbacks you'll need to
 explicitly pass in `async: true`.
 
-### fun(writableStream[, opts]) → PromiseStream
+### fun(writableStream[, opts]) → FunStream
 
 Writable streams can't be fun per se, since being fun means having
 iterators.  But they can at least promise their results.  If you make a
@@ -120,6 +120,10 @@ existing class or object. Classes that have fun mixed in need to also call
 Contrary to ordinary, BORING streams, we make sure errors are passed along
 when we chain into something.  This applies when you `.map` or `.filter` but
 it ALSO applies when you `.pipe`.
+
+## Funstream and Promises
+
+All Funstreams are Promises that resolve when the stream is complete.
 
 ## Funstream methods
 
@@ -258,7 +262,7 @@ It's just sugar for: `reduceToArray((acc, val) => acc.push(val), opts)`
 
 Promise a string produced by concatenating all of the values in the stream
 
-### .reduce(reduceWith[, initial[, opts]]) → PromiseStream
+### .reduce(reduceWith[, initial[, opts]]) → FunStream
 
 Promise the result of computing everything.
 
@@ -277,7 +281,7 @@ The return value is _also_ a stream, so you can hang the usual event
 listeneners off it.  Reduce streams emit a `result` event just before
 `finish` with the final value of the accumulator in the reduce.
 
-### .reduceToArray(reduceWith, opts) → PromiseStream
+### .reduceToArray(reduceWith, opts) → FunStream
 
 Promise the result of reducing into an array.  Handy when you want to push
 on to an array without worrying about your return value. This is sugar for:
@@ -287,7 +291,7 @@ fun(stream)
   .reduce((acc, value) => { reduceWith(acc, value) ; return acc }, [])
 ```
 
-### .reduceToArray(reduceWith, opts) → PromiseStream
+### .reduceToArray(reduceWith, opts) → FunStream
 
 Promise the result of reducing into an array. Handy when you want to build
 an object without worrying about your return values. This is sugar for:
@@ -297,7 +301,7 @@ fun(stream)
   .reduce((acc, value) => { reduceWith(acc, value) ; return acc }, {})
 ```
 
-### .forEach(consumeWith[, opts]) → PromiseStream
+### .forEach(consumeWith[, opts]) → FunStream
 
 Run some code for every chunk, promise that the stream is done.
 

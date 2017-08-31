@@ -3,6 +3,7 @@ const fun = require('./index.js')
 const INIT = Symbol('init')
 const OPTS = Symbol('opts')
 const ISFUN = Symbol('isFun')
+const mixinPromiseStream = require('./promise-stream.js')
 let FilterStream
 let MapStream
 let FlatMapStream
@@ -110,6 +111,9 @@ function isAsync (fun, args, opts) {
 
 function mixinFun (stream, opts) {
   if (FunStream.isFun(stream)) return stream
+
+  const P = (opts && opts.Promise) || fun.Promise
+  mixinPromiseStream(P, stream)
 
   const cls = typeof stream === 'function' ? stream : null
   const obj = cls ? cls.prototype : stream
