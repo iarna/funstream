@@ -2,7 +2,7 @@
 const EventEmitter = require('events')
 
 class NullSink extends EventEmitter {
-  write (d) {
+  write () {
     return true
   }
   end () {
