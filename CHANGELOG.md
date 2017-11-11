@@ -1,3 +1,7 @@
+# 2.3.1
+
+* Eep actually include flat-map-stream in the artifact
+
 # 2.3.0
 
 New features!

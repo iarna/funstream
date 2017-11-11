@@ -18,6 +18,7 @@
   },
   "files": [
     "filter-stream.js",
+    "flat-map-stream.js",
     "for-each-stream.js",
     "fun-array.js",
     "fun-generator.js",
