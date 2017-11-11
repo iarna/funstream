@@ -56,6 +56,12 @@ process.stdin.pipe(fun())
 
 // Fun functions can be callback using…
 .async().map((str, cb) => transformStrCB(str, cb))
+
+// And you can bundle up some transforms into a transform stream:
+const mytransformStream =
+  fun(stream => stream.map(str => str.toUpperCase).
+                       flatMap(v = [v, v]))
+
 ```
 
 Funstream makes object streams better.
@@ -67,7 +73,8 @@ Funstream makes object streams better.
 This is probably what you want.
 
 Makes an existing stream a funstream!  Has the advantage over `fun()` of
-handling error propagation for you.
+handling error propagation for you.  All funs are promises of their
+completion too, so you can `await` or `.catch` your stream.
 
 `opts` is an optional options object.  The only option currently is `async`
 which let's you explicitly tell Funstream if your callbacks are sync or
@@ -75,6 +82,14 @@ async. If you don't include this we'll detect which you're using by looking
 at the number of arguments your callback takes. Because promises and sync functions
 take the same number of arguments, if you're using promise returning callbacks you'll need to
 explicitly pass in `async: true`.
+
+### fun(callback[, opts]) → FunStream
+
+This lets you bundle a fun-stream pipeline up into a single transform stream
+that you might pass to something else.  The callback receives a FunStream as
+its only argument, chain off of that as you like and return the result.  The
+stream returned by `fun()` will write to that first FunStream and read from
+the end of your chain. (With the usual error propagation.)
 
 ### fun(writableStream[, opts]) → FunStream
 

@@ -21,6 +21,7 @@
     "flat-map-stream.js",
     "for-each-stream.js",
     "fun-array.js",
+    "fun-duplex.js",
     "fun-generator.js",
     "fun-passthrough.js",
     "fun-stream.js",

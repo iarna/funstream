@@ -3,6 +3,7 @@ module.exports = fun
 
 let FunPassThrough
 let FunArray
+let FunDuplex
 let FunGenerator
 let mixinPromiseStream
 
@@ -28,9 +29,16 @@ function fun (stream, opts) {
     if (!FunPassThrough) FunPassThrough = require('./fun-passthrough.js')
     return new FunPassThrough(Object.assign({Promise: fun.Promise}, opts || {}))
   }
+
   if (Array.isArray(stream)) {
     if (!FunArray) FunArray = require('./fun-array.js')
     return new FunArray(stream, Object.assign({Promise: fun.Promise}, opts || {}))
+  }
+  if (typeof stream === 'function') {
+    if (!FunDuplex) FunDuplex = require('./fun-duplex.js')
+    const input = fun(null, opts)
+    const output = stream(input)
+    return new FunDuplex(input, output, opts)
   }
   if (typeof stream === 'object') {
     if (Symbol.iterator in stream) {

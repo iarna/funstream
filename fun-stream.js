@@ -113,9 +113,9 @@ function mixinFun (stream, opts) {
   if (FunStream.isFun(stream)) return stream
 
   const P = (opts && opts.Promise) || fun.Promise
-  mixinPromiseStream(P, stream)
 
   const cls = typeof stream === 'function' ? stream : null
+  !cls && mixinPromiseStream(P, stream)
   const obj = cls ? cls.prototype : stream
 
   if (cls) {
