@@ -1,3 +1,7 @@
+# 2.4.0
+
+* Add pipe-chain bundling in the form of `fun(stream => stream.pipe.chain)`.
+
 # 2.3.2
 
 * Fix async flatMap
