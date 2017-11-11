@@ -26,7 +26,7 @@ class ReduceStreamAsync extends Writable {
       next()
     } else {
       const handleResult = (err, value) => {
-        this.acc = result
+        this.acc = value
         next(err)
       }
       const result = this.reduceWith(this.acc, data, handleResult)
