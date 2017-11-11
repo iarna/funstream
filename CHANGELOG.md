@@ -1,3 +1,7 @@
+# 2.3.2
+
+* Fix async flatMap
+
 # 2.3.1
 
 * Eep actually include flat-map-stream in the artifact

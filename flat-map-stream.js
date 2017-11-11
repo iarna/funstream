@@ -21,17 +21,11 @@ class FlatMapStreamAsync extends FunTransform {
     this[MAP] = mapWith
   }
   _transform (data, encoding, next) {
-    try {
-      const result = this[MAP](data, handleResult)
-      if (result && result.then) return result.then(keep => handleResult(null, keep), handleResult)
-    } catch (ex) {
-      return next (ex)
-    }
-    function handleResult (err, value) {
+    const handleResult = (err, results) => {
       if (err) return next(err)
       if (Array.isArray(results)) {
-        this.push.apply(this, results)
-      } else if (Symbol.iterator in results) {
+        results.forEach(v => this.push(v))
+      } else if (results && typeof results == 'object' && Symbol.iterator in results) {
         const ii = results[Symbol.iterator]();
         while (true) {
           const rr = ii.next()
@@ -41,6 +35,13 @@ class FlatMapStreamAsync extends FunTransform {
       } else {
         this.push(results)
       }
+      next()
+    }
+    try {
+      const result = this[MAP](data, handleResult)
+      if (result && result.then) return result.then(keep => handleResult(null, keep), handleResult)
+    } catch (ex) {
+      return handleResult(ex)
     }
   }
 }
