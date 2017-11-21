@@ -9,8 +9,7 @@ class Duplex {
   constructor (input, output, opts) {
     this[INPUT] = input
     this[OUTPUT] = output
-    const P = (opts && opts.Promise) || fun.Promise
-    mixinPromiseStream(P, this)
+    Duplex.funInit.call(this, opts)
   }
   // EventEmitter
   eventNames () {
