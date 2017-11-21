@@ -117,6 +117,13 @@ while respecting back pressure.
 Returns a funstream that will receive values from the generator one at a time
 while respecting back pressure.
 
+### fun(promise[,opts]) → FunStream
+
+Returns a funstream that will consume the result of the promise exactly as
+the equivalent plain value would be.  No data will be emitted until the promise
+resolves. If it rejects it will be propagated as an error in the usual ways.
+
+
 ### fun([opts]) → FunStream
 
 Make a passthrough Funstream.  You can pipe into this to get access to our
