@@ -107,6 +107,11 @@ This is how `reduce` and `forEach` get their return values.
 Returns a funstream that will receive entries from the array one at a time
 while respecting back pressure.
 
+### fun(string[,opts]) → FunStream
+
+Returns a funstream that will receive entries from the array one at a time
+while respecting back pressure.
+
 ### fun(generator[,opts]) → FunStream
 
 Returns a funstream that will receive values from the generator one at a time

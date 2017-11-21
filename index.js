@@ -30,6 +30,9 @@ function fun (stream, opts) {
     return new FunPassThrough(Object.assign({Promise: fun.Promise}, opts || {}))
   }
 
+  if (typeof stream === 'string') {
+    stream = [stream]
+  }
   if (Array.isArray(stream)) {
     if (!FunArray) FunArray = require('./fun-array.js')
     return new FunArray(stream, Object.assign({Promise: fun.Promise}, opts || {}))

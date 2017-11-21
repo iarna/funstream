@@ -27,6 +27,16 @@ test('construction', t => {
   t.is(typeof arrayFun.pause, 'function', 'fun(array) is readable')
   t.is(typeof arrayFun.write, 'undefined', 'fun(array) is NOT writable')
 
+  const stringFun = fun('abc')
+  t.is(FunStream.isFun(stringFun), true, 'fun(string) is fun')
+  t.is(typeof stringFun.pause, 'function', 'fun(string) is readable')
+  t.is(typeof stringFun.write, 'undefined', 'fun(string) is NOT writable')
+
+  const bufferFun = fun(Buffer.from('abc'))
+  t.is(FunStream.isFun(bufferFun), true, 'fun(buffer) is fun')
+  t.is(typeof bufferFun.pause, 'function', 'fun(buffer) is readable')
+  t.is(typeof bufferFun.write, 'undefined', 'fun(buffer) is NOT writable')
+
   const readableFun = fun(new stream.Readable({read () { this.push(null) }}))
   t.is(FunStream.isFun(readableFun), true, 'fun(Readable) is fun')
   t.is(typeof readableFun.pause, 'function', 'fun(Readable) is readable')
