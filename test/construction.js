@@ -76,6 +76,16 @@ test('promised construction', t => {
   t.is(typeof arrayFun.pause, 'function', 'Promised fun(array) is readable')
   t.is(typeof arrayFun.write, 'function', 'Promised fun(array) is writable')
 
+  const stringFun = fun(Promise.resolve('abc'))
+  t.is(FunStream.isFun(stringFun), true, 'Promised fun(string) is fun')
+  t.is(typeof stringFun.pause, 'function', 'Promised fun(string) is readable')
+  t.is(typeof stringFun.write, 'function', 'Promised fun(string) is writable')
+
+  const bufferFun = fun(Promise.resolve(Buffer.from('abc')))
+  t.is(FunStream.isFun(bufferFun), true, 'Promised fun(buffer) is fun')
+  t.is(typeof bufferFun.pause, 'function', 'Promised fun(buffer) is readable')
+  t.is(typeof bufferFun.write, 'function', 'Promised fun(buffer) is writable')
+
   const readableFun = fun(Promise.resolve(new stream.Readable({read () { this.push(null) }})))
   t.is(FunStream.isFun(readableFun), true, 'Promised fun(Readable) is fun')
   t.is(typeof readableFun.pause, 'function', 'Promised fun(Readable) is readable')

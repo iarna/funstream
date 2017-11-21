@@ -30,7 +30,7 @@ function fun (stream, opts) {
     return new FunPassThrough(Object.assign({Promise: fun.Promise}, opts || {}))
   }
 
-  if (typeof stream === 'string') {
+  if (typeof stream === 'string' || Buffer.isBuffer(stream)) {
     stream = [stream]
   }
   if (Array.isArray(stream)) {
