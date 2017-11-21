@@ -1,6 +1,8 @@
 'use strict'
 module.exports = fun
 
+const isaStream = require('isa-stream')
+
 let FunPassThrough
 let FunArray
 let FunDuplex
@@ -44,13 +46,13 @@ function fun (stream, opts) {
     return new FunDuplex(input, output, opts)
   }
   if (typeof stream === 'object') {
-    if (Symbol.iterator in stream) {
+    if (Symbol.iterator in stream && 'next' in stream) {
       if (!FunGenerator) FunGenerator = require('./fun-generator.js')
       return new FunGenerator(stream, Object.assign({Promise: fun.Promise}, opts || {}))
-    } else if ('pause' in stream) {
+    } else if (isaStream.Readable(stream)) {
       if (!FunPassThrough) FunPassThrough = require('./fun-passthrough.js')
       return FunPassThrough.mixin(stream, Object.assign({Promise: fun.Promise}, opts || {}))
-    } else if ('write' in stream) {
+    } else if (isaStream.Writable(stream)) {
       if (!mixinPromiseStream) mixinPromiseStream = require('./promise-stream.js')
       const P = (opts && opts.Promise) || fun.Promise
       return mixinPromiseStream(P, stream)
