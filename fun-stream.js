@@ -14,6 +14,7 @@ class FunStream {
   [INIT] (opts) {
     this[OPTS] = Object.assign({Promise: Promise}, opts || {})
     this[ISFUN] = true
+    mixinPromiseStream(this[OPTS].Promise, this)
   }
   async () {
     this[OPTS].async = true
