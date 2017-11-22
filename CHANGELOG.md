@@ -1,3 +1,10 @@
+# 2.5.0
+
+* Strings can now be fun too.
+* Also Buffers.
+* Improve stream duck typing
+* Really, truely, all things are _also_ promises now.
+
 # 2.4.0
 
 * Add pipe-chain bundling in the form of `fun(stream => stream.pipe.chain)`.
