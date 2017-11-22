@@ -1,3 +1,7 @@
+# 2.5.1
+
+* Readme improvements
+
 # 2.5.0
 
 * Strings can now be fun too.
