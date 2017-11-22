@@ -97,7 +97,7 @@ Writable streams can't be fun per se, since being fun means having
 iterators.  But they can at least promise their results.  If you make a
 writable stream fun then you'll get a stream/promise hybrid.  All the power
 of a stream, but with the promise methods of your favorite promise
-implmenetation.  The promise will Resolve when the stream finishes and
+implementation.  The promise will Resolve when the stream finishes and
 Reject if it errors.
 
 This is how `reduce` and `forEach` get their return values.
@@ -133,7 +133,7 @@ handy methods.
 
 Exactly the same as `stream.PassThrough` but with fun added.  `fun()` is
 mostly the same as `new fun.FunStream()`.  (The former will use Bluebird for
-promises if available but fallback to system promsies.  The latter has no
+promises if available but fallback to system promises.  The latter has no
 magic and just uses system promises.)
 
 ### require('funstream/fun-stream').mixin
@@ -157,7 +157,7 @@ All Funstreams are Promises that resolve when the stream is complete.
 This is the good stuff.  All callbacks can be sync or async.  You can
 indicate this by setting the `async` property on the opts object either when
 calling the method below or when constructing the objects to start with.
-Values of the `async` property progogate down the chain, for example:
+Values of the `async` property propagate down the chain, for example:
 
 `.map(…, {async: true}).map(…)`
 
@@ -169,7 +169,7 @@ without constructing additional streams, so:
 `.filter(n => n < 23).filter(n => n > 5)`
 
 The second `filter` call actually returns the same stream object.  This does
-mean that if you try to fork the streams inbetween it won't work. Sorry.
+mean that if you try to fork the streams in between it won't work. Sorry.
 
 ### .pipe(target[, opts]) → FunStream(target)
 
@@ -178,7 +178,7 @@ funstream we also forward errors to it.
 
 ### .head(numberOfItems) → FunStream
 
-Will only foward the first `numberOfItems` down stream.  The remainder are
+Will only forward the first `numberOfItems` down stream.  The remainder are
 ignored.  At the moment this does not end the stream after the
 `numberOfItems` limit is hit, but in future it likely will.
 
@@ -235,7 +235,7 @@ the equivalent of:
 map(…).flat()
 ```
 
-Only without mutiple phases.
+Only without multiple phases.
 
 ### .sort(sortWith, opts) → FunStream
 
@@ -243,10 +243,8 @@ WARNING: This has to load all of your content into memory in order to sort
 it, so be sure to do your filtering or limiting (with `.head`) before you
 call this. This results in a funstream fed from the sorted array.
 
-`sortWith` must be synchronous (as it's ultimately passed to
-`Array.sort`).
-
-* `sortWith(a, b) → -1 | 0 | 1` – It's the usual sort comparison function, per `Array.sort`.
+`sortWith(a, b) → -1 | 0 | 1` – It's the usual sort comparison function.  It
+must be synchronous as it's ultimately passed to `Array.sort`.
 
 Sort a stream alphabetically:
 
@@ -257,12 +255,9 @@ fun(stream)
 
 ### .grab(grabWith, opts) → FunStream
 
-WARNING: This has to load all of your content into memory in order to sort
-it, so be sure to do your filtering or limiting (with `.head`) before you
-call this. This results in a funstream fed from the sorted array.
-
-`grabWith` is a synchronous funciton.  It accepts the entire stream as an
-array as an argument and turns the return value into a stream with `fun()`.
+`grabWith` is a synchronous function. It takes an array as an argument and
+turns the return value back into a stream with `fun()`. The array
+is produced by reading the entire stream, so be warned.
 
 For example, sort can be implemented as:
 
@@ -274,6 +269,8 @@ function sortStream (st) {
 
 It makes it easy to apply array verbs to a stream that aren't otherwise
 supported but it does mean loading the entire stream into memory.
+
+It's the equivalent of `fun(grabWith(await stream.list()))`
 
 ### .list(opts) → FunStream
 
@@ -287,7 +284,7 @@ It's just sugar for: `reduceToArray((acc, val) => acc.push(val), opts)`
 
 ### .concat(opts) → FunStream
 
-Promise a string produced by concatenating all of the values in the stream
+Promise a string produced by concatenating all of the values in the stream.
 
 ### .reduce(reduceWith[, initial[, opts]]) → FunStream
 
@@ -305,7 +302,7 @@ fun(stream)
 ```
 
 The return value is _also_ a stream, so you can hang the usual event
-listeneners off it.  Reduce streams emit a `result` event just before
+listeners off it.  Reduce streams emit a `result` event just before
 `finish` with the final value of the accumulator in the reduce.
 
 ### .reduceToArray(reduceWith, opts) → FunStream
