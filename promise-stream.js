@@ -10,21 +10,30 @@ function mixinPromise (Promise, stream) {
   if (MAKEPROMISE in obj) return stream
 
   let error
-  obj.once('error', err => { error = err })
+  const onError = err => { error = err }
+  obj.once('error', onError)
   if ('write' in stream) {
     let finished = false
     let result
-    obj.once('result', value => { result = value })
-    obj.once('finish', () => setImmediate(() => { finished = true }))
+    const onEarlyResult = value => { result = value }
+    obj.once('result', onEarlyResult)
+    const onEarlyFinish = () => setImmediate(() => { finished = true })
+    obj.once('finish', onEarlyFinish)
     obj[MAKEPROMISE] = function () {
       if (error) {
+        this.removeListener('result', onEarlyResult)
+        this.removeListener('finish', onEarlyFinish)
         this[PROMISE] = Promise.reject(error)
       } else if (result || finished) {
+        this.removeListener('error', onError)
         this[PROMISE] = Promise.resolve(result)
       } else {
         this[PROMISE] = new Promise((resolve, reject) => {
+          this.removeListener('error', onError)
+          this.removeListener('result', onEarlyResult)
+          this.removeListener('finish', onEarlyFinish)
           this.once('result', resolve)
-          // finish should always lose any race w/ result
+          // make sure finish will always lose any race w/ result
           this.once('finish', () => setImmediate(resolve))
           this.once('error', reject)
         })
@@ -32,13 +41,18 @@ function mixinPromise (Promise, stream) {
     }
   } else {
     let ended = false
-    obj.once('end', () => { ended = true })
+    const onEarlyEnd = () => { ended = true }
+    obj.once('end', onEarlyEnd)
     obj[MAKEPROMISE] = function () {
       if (error) {
+        this.removeListener('end', onEarlyEnd)
         this[PROMISE] = Promise.reject(error)
       } else if (ended) {
+        this.removeListener('error', onError)
         this[PROMISE] = Promise.resolve()
       } else {
+        this.removeListener('end', onEarlyEnd)
+        this.removeListener('error', onError)
         this[PROMISE] = new Promise((resolve, reject) => {
           this.once('end', resolve)
           this.once('error', reject)
