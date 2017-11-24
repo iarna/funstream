@@ -41,6 +41,26 @@ function isScalar (value) {
   }
 }
 
+function isIterator (value) {
+  return Symbol.iterator in value && 'next' in value
+}
+
+function isThenable (value) {
+  return 'then' in value
+}
+
+function isPlainObject (value) {
+  if (value == null) return false
+  if (typeof value !== 'object') return false
+  if (Array.isArray(value)) return false
+  if (Buffer.isBuffer(value)) return false
+  if (isIterator(value)) return false
+  if (isaStream.Readable(value)) return false
+  if (isaStream.Writable(value)) return false
+  if (isThenable(value)) return false
+  return true
+}
+
 function fun (stream, opts) {
   if (stream == null) {
     if (!FunPassThrough) FunPassThrough = require('./fun-passthrough.js')
@@ -61,7 +81,7 @@ function fun (stream, opts) {
     return new FunDuplex(input, output, opts)
   }
   if (typeof stream === 'object') {
-    if (Symbol.iterator in stream && 'next' in stream) {
+    if (isIterator(stream)) {
       if (!FunGenerator) FunGenerator = require('./fun-generator.js')
       return new FunGenerator(stream, Object.assign({Promise: fun.Promise}, opts || {}))
     } else if (isaStream.Readable(stream)) {
