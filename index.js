@@ -8,6 +8,7 @@ let FunStream
 let FunArray
 let FunDuplex
 let FunGenerator
+let StreamPromise
 let mixinPromiseStream
 
 Object.defineProperty(fun, 'FunStream', {
@@ -100,15 +101,9 @@ function fun (stream, opts) {
         if (diff) return stream.pipe(new FunPassThrough(funopts))
       }
       return FunPassThrough.mixin(stream, Object.assign({Promise: fun.Promise}, opts || {}))
-    } else if ('then' in stream) { // promises of fun
-      if (!FunPassThrough) FunPassThrough = require('./fun-passthrough.js')
-      const resultStream = new FunPassThrough(Object.assign({Promise: fun.Promise}, opts || {}))
-      stream.then(promised => {
-        const srcStream = fun(promised)
-        resultStream.emit('result', promised)
-        return FunPassThrough.isFun(srcStream) ? srcStream.pipe(resultStream) : resultStream.pipe(srcStream)
-      }).catch(err => resultStream.emit('error', err))
-      return resultStream
+    } else if (isThenable(stream)) { // promises of fun
+      if (!StreamPromise) StreamPromise = require('./stream-promise.js')
+      return new StreamPromise(stream, Object.assign({Promise: fun.Promise}, opts || {}))
     // note that promise-streamed writables are treated as promises, not as writables
     } else if (isaStream.Writable(stream)) {
       if (!mixinPromiseStream) mixinPromiseStream = require('./mixin-promise-stream.js')
