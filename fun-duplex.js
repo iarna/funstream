@@ -1,7 +1,6 @@
 'use strict'
 const fun = require('./index.js')
 const FunStream = require('./fun-stream.js')
-const mixinPromiseStream = require('./promise-stream.js')
 const INPUT = Symbol('input')
 const OUTPUT = Symbol('output')
 
