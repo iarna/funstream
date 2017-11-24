@@ -1,6 +1,7 @@
 'use strict'
 const Writable = require('stream').Writable
 const MiniSyncSink = require('./mini-sync-sink')
+const mixinPromiseStream = require('./promise-stream.js')
 let FunStream
 
 module.exports = ReduceStream
@@ -8,15 +9,16 @@ module.exports = ReduceStream
 function ReduceStream (reduceWith, initial, opts) {
   FunStream = require('./fun-stream.js')
   if (FunStream.isAsync(reduceWith, 2, opts)) {
-    return new ReduceStreamAsync(reduceWith, initial)
+    return new ReduceStreamAsync(reduceWith, initial, opts)
   } else {
-    return new ReduceStreamSync(reduceWith, initial)
+    return new ReduceStreamSync(reduceWith, initial, opts)
   }
 }
 
 class ReduceStreamAsync extends Writable {
-  constructor (reduceWith, initial) {
+  constructor (reduceWith, initial, opts) {
     super({objectMode: true})
+    mixinPromiseStream(opts.Promise, this)
     this.reduceWith = reduceWith
     this.acc = initial
   }
@@ -40,8 +42,8 @@ class ReduceStreamAsync extends Writable {
 }
 
 class ReduceStreamSync extends MiniSyncSink {
-  constructor (reduceWith, initial) {
-    super()
+  constructor (reduceWith, initial, opts) {
+    super(opts)
     this.reduceWith = reduceWith
     this.acc = initial
   }
