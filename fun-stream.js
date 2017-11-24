@@ -16,13 +16,29 @@ class FunStream {
     this[ISFUN] = true
     mixinPromiseStream(this[OPTS].Promise, this)
   }
-  async () {
-    this[OPTS].async = true
-    return this
+  async (todo) {
+    if (todo) {
+      const value = this[OPTS].async
+      this[OPTS].async = true
+      const next = todo.call(this, this)
+      next[OPTS].async = value
+      return next
+    } else {
+      this[OPTS].async = true
+      return this
+    }
   }
-  sync () {
-    this[OPTS].async = false
-    return this
+  sync (todo) {
+    if (todo) {
+      const value = this[OPTS].async
+      this[OPTS].async = false
+      const next = todo.call(this, this)
+      next[OPTS].async = value
+      return next
+    } else {
+      this[OPTS].async = false
+      return this
+    }
   }
   pipe (into, opts) {
     this.on('error', err => {
@@ -42,7 +58,7 @@ class FunStream {
     return this.pipe(map)
   }
   flat (opts) {
-    return this.flatMap(v => v, opts)
+    return this.sync(o => o.flatMap(v => v, opts))
   }
   flatMap (mapWith, opts) {
     if (!FlatMapStream) FlatMapStream = require('./flat-map-stream.js')
@@ -51,7 +67,7 @@ class FunStream {
   }
   head (maxoutput) {
     let seen = 0
-    return this.filter(() => seen++ < maxoutput)
+    return this.sync(o => o.filter(() => seen++ < maxoutput))
   }
   reduce (reduceWith, initial, reduceOpts) {
     if (!ReduceStream) ReduceStream = require('./reduce-stream.js')
@@ -60,9 +76,9 @@ class FunStream {
   }
   reduceTo (reduceWith, initial, reduceOpts) {
     const opts = Object.assign({}, this[OPTS], reduceOpts || {})
-    let reduceToObjectWith
+    let reduceToWith
     if (isAsync(reduceWith, 2, opts)) {
-      reduceToObjectWith = (acc, value, cb) => {
+      reduceToWith = (acc, value, cb) => {
         return new opts.Promise((resolve, reject) => {
           const result = reduceWith(acc, value, err => err ? reject(err) : resolve())
           if (result && result.then) resolve(result)
@@ -70,9 +86,9 @@ class FunStream {
       }
     } else {
       /* eslint no-sequences:0 */
-      reduceToObjectWith = (acc, value) => (reduceWith(acc, value), acc)
+      reduceToWith = (acc, value) => (reduceWith(acc, value), acc)
     }
-    return this.reduce(reduceToObjectWith, initial, opts)
+    return this.reduce(reduceToWith, initial, opts)
   }
   reduceToObject (reduceWith, opts) {
     return this.reduceTo(reduceWith, {}, opts)
@@ -81,7 +97,7 @@ class FunStream {
     return this.reduceTo(reduceWith, [], opts)
   }
   list (opts) {
-    return this.reduceToArray((acc, val) => acc.push(val), opts)
+    return this.sync(o => o.reduceToArray((acc, val) => acc.push(val), opts))
   }
   grab (whenDone, opts) {
     return fun(this.list().then(v => whenDone(v)))
@@ -90,7 +106,7 @@ class FunStream {
     return this.grab(v => v.sort(sortWith))
   }
   concat (opts) {
-    return this.reduce((acc, val) => acc + val, '', opts)
+    return this.sync(o => o.reduce((acc, val) => acc + val, '', opts))
   }
   forEach (forEachWith, forEachOpts) {
     if (!ForEachStream) ForEachStream = require('./for-each-stream.js')
