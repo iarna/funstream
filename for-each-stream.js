@@ -1,6 +1,6 @@
 'use strict'
 const Writable = require('stream').Writable
-const mixinPromiseStream = require('./promise-stream.js')
+const mixinPromiseStream = require('./mixin-promise-stream.js')
 let MiniSyncSink
 let FunStream
 

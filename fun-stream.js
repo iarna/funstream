@@ -3,7 +3,7 @@ const fun = require('./index.js')
 const INIT = Symbol('init')
 const OPTS = Symbol('opts')
 const ISFUN = Symbol('isFun')
-const mixinPromiseStream = require('./promise-stream.js')
+const mixinPromiseStream = require('./mixin-promise-stream.js')
 let FilterStream
 let MapStream
 let FlatMapStream

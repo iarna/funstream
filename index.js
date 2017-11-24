@@ -91,7 +91,7 @@ function fun (stream, opts) {
       return resultStream
     // note that promise-streamed writables are treated as promises, not as writables
     } else if (isaStream.Writable(stream)) {
-      if (!mixinPromiseStream) mixinPromiseStream = require('./promise-stream.js')
+      if (!mixinPromiseStream) mixinPromiseStream = require('./mixin-promise-stream.js')
       const P = (opts && opts.Promise) || fun.Promise
       return mixinPromiseStream(P, stream)
     } else if (opts == null) {

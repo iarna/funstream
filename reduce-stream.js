@@ -1,7 +1,7 @@
 'use strict'
 const Writable = require('stream').Writable
 const MiniSyncSink = require('./mini-sync-sink')
-const mixinPromiseStream = require('./promise-stream.js')
+const mixinPromiseStream = require('./mixin-promise-stream.js')
 let FunStream
 
 module.exports = ReduceStream

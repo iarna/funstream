@@ -1,6 +1,6 @@
 'use strict'
 const EventEmitter = require('events').EventEmitter
-const mixinPromiseStream = require('./promise-stream.js')
+const mixinPromiseStream = require('./mixin-promise-stream.js')
 
 class MiniSyncSink extends EventEmitter {
   constructor (opts) {
