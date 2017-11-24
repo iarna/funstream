@@ -1,6 +1,5 @@
 'use strict'
 const fun = require('./index.js')
-const INIT = Symbol('init')
 const OPTS = Symbol('opts')
 const ISFUN = Symbol('isFun')
 const mixinPromiseStream = require('./mixin-promise-stream.js')
@@ -11,7 +10,7 @@ let ReduceStream
 let ForEachStream
 
 class FunStream {
-  [INIT] (opts) {
+  init (opts) {
     this[OPTS] = Object.assign({Promise: Promise}, opts || {})
     this[ISFUN] = true
     mixinPromiseStream(this[OPTS].Promise, this)
@@ -118,6 +117,13 @@ class FunStream {
 FunStream.isFun = stream => Boolean(stream && stream[ISFUN])
 FunStream.mixin = mixinFun
 FunStream.isAsync = isAsync
+FunStream.funInit = function () {
+  const fn = this.init ? this.init
+           : this.prototype && this.prototype.init ? this.prototype.init
+           : FunStream.prototype.init
+  return fn.apply(this, arguments)
+}
+
 FunStream.OPTS = OPTS
 
 function isAsync (fun, args, opts) {
@@ -139,9 +145,9 @@ function mixinFun (stream, opts) {
     cls.isFun = FunStream.isFun
     cls.mixin = FunStream.mixin
     cls.isAsync = FunStream.isAsync
-    cls.funInit = FunStream.prototype[INIT]
+    cls.funInit = FunStream.funInit
   } else {
-    FunStream.prototype[INIT].call(obj, opts)
+    FunStream.funInit.call(obj, opts)
   }
 
   obj.filter = FunStream.prototype.filter
