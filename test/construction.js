@@ -4,7 +4,7 @@ const fun = require('..')
 const FunStream = fun.FunStream
 const stream = require('stream')
 const Promise = require('bluebird')
-const NullSink = require('../null-sink.js')
+const NullSink = require('./lib/null-sink.js')
 
 test('construction', t => {
   const plainFun = fun()
