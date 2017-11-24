@@ -4,6 +4,7 @@ module.exports = fun
 const isaStream = require('isa-stream')
 
 let FunPassThrough
+let FunStream
 let FunArray
 let FunDuplex
 let FunGenerator
@@ -26,13 +27,27 @@ try {
   fun.Promise = Promise
 }
 
+function isScalar (value) {
+  if (value == null) return true
+  if (Buffer.isBuffer(value)) return true
+  switch (typeof value) {
+    case 'string':
+    case 'number':
+    case 'boolean':
+    case 'symbol':
+      return true
+    default:
+      return false
+  }
+}
+
 function fun (stream, opts) {
   if (stream == null) {
     if (!FunPassThrough) FunPassThrough = require('./fun-passthrough.js')
     return new FunPassThrough(Object.assign({Promise: fun.Promise}, opts || {}))
   }
 
-  if (typeof stream === 'string' || Buffer.isBuffer(stream)) {
+  if (isScalar(stream)) {
     stream = [stream]
   }
   if (Array.isArray(stream)) {
@@ -51,6 +66,19 @@ function fun (stream, opts) {
       return new FunGenerator(stream, Object.assign({Promise: fun.Promise}, opts || {}))
     } else if (isaStream.Readable(stream)) {
       if (!FunPassThrough) FunPassThrough = require('./fun-passthrough.js')
+      if (!FunStream) FunStream = require('./fun-stream.js')
+      if (FunPassThrough.isFun(stream) && opts) {
+        const funopts = Object.assign({Promise: fun.Promise}, opts)
+        const curopts = stream[FunStream.OPTS]
+        let diff = false
+        for (let k of Object.keys(funopts).concat(Object.keys(curopts))) {
+          if (funopts[k] !== curopts[k]) {
+            diff = true
+            break
+          }
+        }
+        if (diff) return stream.pipe(new FunPassThrough(funopts))
+      }
       return FunPassThrough.mixin(stream, Object.assign({Promise: fun.Promise}, opts || {}))
     } else if ('then' in stream) { // promises of fun
       if (!FunPassThrough) FunPassThrough = require('./fun-passthrough.js')
