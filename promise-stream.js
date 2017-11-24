@@ -63,11 +63,8 @@ function mixinPromise (Promise, stream) {
 
   // the core interface
   for (let name of ['then', 'catch']) {
-    obj[name] = function () {
-      let func = Promise.prototype[name]
-      if (!this[PROMISE]) this[MAKEPROMISE]()
-      return func.apply(this[PROMISE], arguments)
-    }
+    let func = Promise.prototype[name]
+    obj[name] = makeProxy(func)
   }
   // and everything else, iterating prototype doesn't
   // work on builtin promises, thus the hard coded list above.
@@ -75,10 +72,14 @@ function mixinPromise (Promise, stream) {
     if (name[0] === '_') continue
     if (name in obj) continue
     let func = Promise.prototype[name]
-    obj[name] = function () {
-      if (!this[PROMISE]) this[MAKEPROMISE]()
-      return func.apply(this[PROMISE], arguments)
-    }
+    obj[name] = makeProxy(func)
   }
   return stream
+}
+
+function makeProxy (func) {
+  return function () {
+    if (!this[PROMISE]) this[MAKEPROMISE]()
+    return func.apply(this[PROMISE], arguments)
+  }
 }
