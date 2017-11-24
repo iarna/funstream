@@ -57,6 +57,7 @@ function fun (stream, opts) {
       const resultStream = new FunPassThrough(Object.assign({Promise: fun.Promise}, opts || {}))
       stream.then(promised => {
         const srcStream = fun(promised)
+        resultStream.emit('result', promised)
         return FunPassThrough.isFun(srcStream) ? srcStream.pipe(resultStream) : resultStream.pipe(srcStream)
       }).catch(err => resultStream.emit('error', err))
       return resultStream
