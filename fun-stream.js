@@ -105,7 +105,7 @@ class FunStream {
     return this.grab(v => v.sort(sortWith))
   }
   concat (opts) {
-    return this.sync(o => o.reduce((acc, val) => acc + val, '', opts))
+    return this.sync(o => o.reduce((acc, val) => acc + String(val), '', opts))
   }
   forEach (forEachWith, forEachOpts) {
     if (!ForEachStream) ForEachStream = require('./for-each-stream.js')
