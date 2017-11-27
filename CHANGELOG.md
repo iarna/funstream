@@ -1,3 +1,7 @@
+# 2.6.1
+
+* Revert: Patch to preserve funopts confuses itself.
+
 # 2.6.0
 
 * Feature: Lazily convert promises to streams.  If you funify a promise and
