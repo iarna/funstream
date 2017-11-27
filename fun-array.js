@@ -1,4 +1,5 @@
 'use strict'
+let fun
 const Readable = require('stream').Readable
 const FunStream = require('./fun-stream.js')
 const OPTS = require('./fun-stream.js').OPTS
@@ -25,12 +26,13 @@ class FunArray extends Readable {
     if (FunStream.isAsync(forEachWith, 1, opts)) {
       return FunStream.prototype.forEach.call(this, forEachWith, forEachOpts)
     } else {
-      return opts.Promise(resolve => {
+      if (!fun) fun = require('./index.js')
+      return fun(new opts.Promise(resolve => {
         process.nextTick(() => {
           this[DATA].forEach(v => forEachWith(v))
           resolve()
         })
-      })
+      }))
     }
   }
 }
