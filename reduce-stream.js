@@ -22,6 +22,7 @@ class ReduceStreamAsync extends Writable {
     mixinPromiseStream(opts.Promise, this)
     this.reduceWith = reduceWith
     this.acc = initial
+    this.once('prefinish', () => this.emit('result', this.acc))
   }
   _write (data, encoding, next) {
     if (this.acc == null) {
@@ -35,10 +36,6 @@ class ReduceStreamAsync extends Writable {
       const result = this.reduceWith(this.acc, data, handleResult)
       if (result && result.then) return result.then(keep => handleResult(null, keep), handleResult)
     }
-  }
-  end () {
-    this.emit('result', this.acc)
-    super.end()
   }
 }
 
