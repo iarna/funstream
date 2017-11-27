@@ -4,7 +4,6 @@ module.exports = fun
 const is = require('./is.js')
 
 let FunPassThrough
-let FunStream
 let FunArray
 let FunDuplex
 let FunGenerator
@@ -53,19 +52,6 @@ function fun (stream, opts) {
       return new FunGenerator(stream, Object.assign({Promise: fun.Promise}, opts || {}))
     } else if (is.Readable(stream)) {
       if (!FunPassThrough) FunPassThrough = require('./fun-passthrough.js')
-      if (!FunStream) FunStream = require('./fun-stream.js')
-      if (FunPassThrough.isFun(stream) && opts) {
-        const funopts = Object.assign({Promise: fun.Promise}, opts)
-        const curopts = stream[FunStream.OPTS]
-        let diff = false
-        for (let k of Object.keys(funopts).concat(Object.keys(curopts))) {
-          if (funopts[k] !== curopts[k]) {
-            diff = true
-            break
-          }
-        }
-        if (diff) return stream.pipe(new FunPassThrough(funopts))
-      }
       return FunPassThrough.mixin(stream, Object.assign({Promise: fun.Promise}, opts || {}))
     } else if (is.thenable(stream)) { // promises of fun
       if (!StreamPromise) StreamPromise = require('./stream-promise.js')
