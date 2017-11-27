@@ -39,13 +39,6 @@ class FunStream {
       return this
     }
   }
-  pipe (into, opts) {
-    this.on('error', err => {
-      if (err.src === undefined) err.src = this
-      into.emit('error', err)
-    })
-    return fun(super.pipe(into, opts), this[OPTS])
-  }
   filter (filterWith, opts) {
     if (!FilterStream) FilterStream = require('./filter-stream.js')
     const filter = FilterStream(filterWith, opts ? Object.assign(this[OPTS], opts) : this[OPTS])
