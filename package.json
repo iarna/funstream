@@ -31,10 +31,12 @@
     "fun-stream.js",
     "fun-transform.js",
     "index.js",
+    "is.js",
     "map-stream.js",
     "mini-sync-sink.js",
-    "promise-stream.js",
-    "reduce-stream.js"
+    "mixin-promise-stream.js",
+    "reduce-stream.js",
+    "stream-promise.js"
   ],
   "directories": {
     "test": "test"
