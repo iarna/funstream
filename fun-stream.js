@@ -79,8 +79,8 @@ class FunStream {
     if (isAsync(reduceWith, 2, opts)) {
       reduceToWith = (acc, value, cb) => {
         return new opts.Promise((resolve, reject) => {
-          const result = reduceWith(acc, value, err => err ? reject(err) : resolve())
-          if (result && result.then) resolve(result)
+          const result = reduceWith(acc, value, err => err ? reject(err) : resolve(acc))
+          if (result && result.then) resolve(acc)
         })
       }
     } else {
