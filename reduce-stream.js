@@ -18,6 +18,7 @@ function ReduceStream (reduceWith, initial, opts) {
 class ReduceStreamAsync extends Writable {
   constructor (reduceWith, initial, opts) {
     super({objectMode: true})
+    this[FunStream.OPTS] = opts
     mixinPromiseStream(opts.Promise, this)
     this.reduceWith = reduceWith
     this.acc = initial
@@ -44,6 +45,7 @@ class ReduceStreamAsync extends Writable {
 class ReduceStreamSync extends MiniSyncSink {
   constructor (reduceWith, initial, opts) {
     super(opts)
+    this[FunStream.OPTS] = opts
     this.reduceWith = reduceWith
     this.acc = initial
   }
