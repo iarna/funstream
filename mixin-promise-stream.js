@@ -45,20 +45,26 @@ function mixinPromise (Promise, stream) {
       }
     } else {
       let ended = false
+      let result
+      const onEarlyResult = value => { result = value }
+      obj.once('result', onEarlyResult)
       const onEarlyEnd = () => { ended = true }
       obj.once('end', onEarlyEnd)
       obj[MAKEPROMISE] = function () {
         if (error) {
+          this.removeListener('result', onEarlyResult)
           this.removeListener('end', onEarlyEnd)
           this[PROMISE] = Promise.reject(error)
-        } else if (ended) {
+        } else if (result || ended) {
           this.removeListener('error', onError)
           this[PROMISE] = Promise.resolve()
         } else {
+          this.removeListener('result', onEarlyResult)
           this.removeListener('end', onEarlyEnd)
           this.removeListener('error', onError)
           this[PROMISE] = new Promise((resolve, reject) => {
-            this.once('end', resolve)
+            this.once('result', resolve)
+            this.once('end', () => setImmediate(resolve))
             this.once('error', reject)
           })
         }
