@@ -8,28 +8,7 @@ const MAKEME = Symbol('makeme')
 const OPTS = FunStream.OPTS
 const PassThrough = require('stream').PassThrough
 const mixinPromiseStream = require('./mixin-promise-stream')
-const isaStream = require('isa-stream')
-
-function isIterator (value) {
-  return Symbol.iterator in value && 'next' in value
-}
-
-function isThenable (value) {
-  return 'then' in value
-}
-
-function isPlainObject (value) {
-  if (value == null) return false
-  if (typeof value !== 'object') return false
-  if (Array.isArray(value)) return false
-  if (Buffer.isBuffer(value)) return false
-  if (isIterator(value)) return false
-  if (isaStream.Readable(value)) return false
-  if (isaStream.Writable(value)) return false
-  if (isThenable(value)) return false
-  return true
-}
-
+const is = require('./is.js')
 
 // this is basically the opposite of the normal stream support, we START with a promise and
 // only lazily construct a stream
@@ -45,7 +24,7 @@ class StreamPromise extends FunStream {
   [MAKEME]() {
     this[STREAM] = new PassThrough(Object.assign({objectMode: true}, this[OPTS]))
     this[PROMISE].then(promised => {
-      const srcStream = fun(isPlainObject(promised) ? [promised] : promised)
+      const srcStream = fun(is.plainObject(promised) ? [promised] : promised)
       return StreamPromise.isFun(srcStream) ? srcStream.pipe(this) : this.pipe(srcStream)
     }).catch(err => this.emit('error', err))
   }

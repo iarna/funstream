@@ -1,7 +1,7 @@
 'use strict'
 module.exports = fun
 
-const isaStream = require('isa-stream')
+const is = require('./is.js')
 
 let FunPassThrough
 let FunStream
@@ -28,47 +28,13 @@ try {
   fun.Promise = Promise
 }
 
-function isScalar (value) {
-  if (value == null) return true
-  if (Buffer.isBuffer(value)) return true
-  switch (typeof value) {
-    case 'string':
-    case 'number':
-    case 'boolean':
-    case 'symbol':
-      return true
-    default:
-      return false
-  }
-}
-
-function isIterator (value) {
-  return Symbol.iterator in value && 'next' in value
-}
-
-function isThenable (value) {
-  return 'then' in value
-}
-
-function isPlainObject (value) {
-  if (value == null) return false
-  if (typeof value !== 'object') return false
-  if (Array.isArray(value)) return false
-  if (Buffer.isBuffer(value)) return false
-  if (isIterator(value)) return false
-  if (isaStream.Readable(value)) return false
-  if (isaStream.Writable(value)) return false
-  if (isThenable(value)) return false
-  return true
-}
-
 function fun (stream, opts) {
   if (stream == null) {
     if (!FunPassThrough) FunPassThrough = require('./fun-passthrough.js')
     return new FunPassThrough(Object.assign({Promise: fun.Promise}, opts || {}))
   }
 
-  if (isScalar(stream)) {
+  if (is.scalar(stream)) {
     stream = [stream]
   }
   if (Array.isArray(stream)) {
@@ -82,10 +48,10 @@ function fun (stream, opts) {
     return new FunDuplex(input, output, opts)
   }
   if (typeof stream === 'object') {
-    if (isIterator(stream)) {
+    if (is.iterator(stream)) {
       if (!FunGenerator) FunGenerator = require('./fun-generator.js')
       return new FunGenerator(stream, Object.assign({Promise: fun.Promise}, opts || {}))
-    } else if (isaStream.Readable(stream)) {
+    } else if (is.Readable(stream)) {
       if (!FunPassThrough) FunPassThrough = require('./fun-passthrough.js')
       if (!FunStream) FunStream = require('./fun-stream.js')
       if (FunPassThrough.isFun(stream) && opts) {
@@ -101,11 +67,11 @@ function fun (stream, opts) {
         if (diff) return stream.pipe(new FunPassThrough(funopts))
       }
       return FunPassThrough.mixin(stream, Object.assign({Promise: fun.Promise}, opts || {}))
-    } else if (isThenable(stream)) { // promises of fun
+    } else if (is.thenable(stream)) { // promises of fun
       if (!StreamPromise) StreamPromise = require('./stream-promise.js')
       return new StreamPromise(stream, Object.assign({Promise: fun.Promise}, opts || {}))
     // note that promise-streamed writables are treated as promises, not as writables
-    } else if (isaStream.Writable(stream)) {
+    } else if (is.Writable(stream)) {
       if (!mixinPromiseStream) mixinPromiseStream = require('./mixin-promise-stream.js')
       const P = (opts && opts.Promise) || fun.Promise
       return mixinPromiseStream(P, stream)
