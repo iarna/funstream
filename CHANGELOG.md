@@ -1,3 +1,27 @@
+# 2.6.0
+
+* Feature: Lazily convert promises to streams.  If you funify a promise and
+  use as a promise, no stream infrastructure will be created.  (This is
+  important for promise-returning fun functions.)
+* Feature: Funify writable promise-streams as if they were promises.  This
+  means that if they a value that value will be preserved, and that means
+  that `fun().reduce().forEach()` will work, for instance.
+* Feature: `forEach` on array-streams now has a synchronous fast-path
+  implementation, where we ignore the stream entirely and just loop over the
+  in memory array.
+* Tests: Many, MANY, were added. A number of files are at 100% coverage now.
+* Fix: Async reduce streams previously would finish early and given incomplete results.
+* Fix: The async reduceTo impelementation previously did not work at all.
+* Fix: Reduce streams weren't copying along options from their parents.
+  This only matters if you chain off of them as a fun-stream and not a
+  promise.
+* Fix: `.concat()` will now work with streams w/ elements that can't be added to strings. (eg, Symbols)
+* Fix: If you pass an existing readable fun-stream to fun we used to just
+  return it.  We still do that if you provide the same options as the
+  fun-stream, if you didn't we pipe into a new one with your options.
+* Fix: `.grab()` now returns a promise-stream.
+* Fix: Sugar like `.concat()` would previously fail if you'd explictly set the mode to `.async()`. This is now fixed.
+
 # 2.5.1
 
 * Readme improvements
