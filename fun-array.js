@@ -23,7 +23,7 @@ class FunArray extends Readable {
   forEach (forEachWith, forEachOpts) {
     const opts = Object.assign({}, this[OPTS], forEachOpts || {})
     if (FunStream.isAsync(forEachWith, 1, opts)) {
-      return super.forEach(forEachWith, forEachOpts)
+      return FunStream.prototype.forEach.call(this, forEachWith, forEachOpts)
     } else {
       return opts.Promise(resolve => {
         process.nextTick(() => {
