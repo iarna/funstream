@@ -4,7 +4,6 @@ const fun = require('..')
 const FunStream = fun.FunStream
 const stream = require('stream')
 const Promise = require('bluebird')
-const NullSink = require('./lib/null-sink.js')
 const is = require('../is.js')
 
 test('construction', t => {
@@ -16,7 +15,7 @@ test('construction', t => {
     const result = make()
     t.is(FunStream.isFun(result), true, `${label} is fun`)
     t.is(is.Readable(result), true, `${label} is readable`)
-    t.is(is.Writable(result),false, `${label} IS NOT writable`)
+    t.is(is.Writable(result), false, `${label} IS NOT writable`)
     hasValue(result, value, label)
   }
   function isWritable (make, label) {
@@ -62,7 +61,6 @@ test('construction', t => {
   return Promise.all(resolutions)
 })
 
-
 test('promised construction', t => {
   const resolutions = []
   function hasValue (stream, value, label) {
@@ -81,9 +79,8 @@ test('promised construction', t => {
     return stream
   }
 
-
   assertFun(() => funAndEnd(Promise.resolve()), '', 'fun()')
-  assertFun(() => funAndEnd(Promise.resolve(),{async: true}), '', 'fun(promise, opts)')
+  assertFun(() => funAndEnd(Promise.resolve(), {async: true}), '', 'fun(promise, opts)')
   assertFun(() => fun(Promise.resolve([1, 2, 3])), '123', 'fun(array)')
   assertFun(() => fun(Promise.resolve('abc')), 'abc', 'fun(string)')
   assertFun(() => fun(Promise.resolve(Buffer.from('abc'))), 'abc', 'fun(buffer)')
@@ -97,7 +94,7 @@ test('promised construction', t => {
     }
   }
   assertFun(() => fun(Promise.resolve(mygen())), '012', 'fun(iterator)')
-  assertFun(() => fun(Promise.resolve(new stream.Readable({read () { this.push('hi') ; this.push(null) }}))), 'hi', 'fun(Readable)')
+  assertFun(() => fun(Promise.resolve(new stream.Readable({read () { this.push('hi'); this.push(null) }}))), 'hi', 'fun(Readable)')
 
   const writableFun = fun(Promise.resolve(new stream.Writable({write () { return true }})))
   t.is(FunStream.isFun(writableFun), true, "Promised fun(Writable) is fun (because we don't know any better)")
@@ -107,7 +104,6 @@ test('promised construction', t => {
 
   const value = {}
   const rejectedFun = fun(Promise.resolve(value))
-  let gotError = false
   rejectedFun.on('data', v => t.is(v, value, 'Promised object was streamed through verbatum'))
   resolutions.push(new Promise(resolve => {
     rejectedFun.on('error', err => {

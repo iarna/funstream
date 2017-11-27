@@ -1,5 +1,4 @@
 'use strict'
-const fun = require('./index.js')
 const FunStream = require('./fun-stream.js')
 const INPUT = Symbol('input')
 const OUTPUT = Symbol('output')
@@ -40,8 +39,8 @@ class Duplex {
     return this
   }
   emit () {
-    return this[INPUT].emit.apply(this[INPUT], arguments)
-        || this[OUTPUT].emit.apply(this[OUTPUT], arguments)
+    return this[INPUT].emit.apply(this[INPUT], arguments) ||
+           this[OUTPUT].emit.apply(this[OUTPUT], arguments)
   }
   once (eventName, listener) {
     const input = this[INPUT]

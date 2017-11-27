@@ -3,7 +3,6 @@ const fun = require('./index.js')
 const FunStream = require('./fun-stream.js')
 const PROMISE = require('./mixin-promise-stream.js').PROMISE
 const STREAM = Symbol('stream')
-const BUILDER = Symbol('builder')
 const MAKEME = Symbol('makeme')
 const OPTS = FunStream.OPTS
 const PassThrough = require('stream').PassThrough
@@ -16,12 +15,12 @@ class StreamPromise extends FunStream {
   constructor (promise, opts) {
     super()
     this[PROMISE] = promise
-    const P = promise.__proto__ === Promise.prototype ? Promise : opts.Promise
+    const P = Object.getPrototypeOf(promise) === Promise.prototype ? Promise : opts.Promise
     mixinPromiseStream(P, this)
     this.init(this, opts)
   }
-  
-  [MAKEME]() {
+
+  [MAKEME] () {
     this[STREAM] = new PassThrough(Object.assign({objectMode: true}, this[OPTS]))
     this[PROMISE].then(promised => {
       const srcStream = fun(is.plainObject(promised) ? [promised] : promised)
@@ -164,6 +163,6 @@ class StreamPromise extends FunStream {
   }
 }
 // inherit the class methods too
-Object.keys(FunStream).forEach(k => StreamPromise[k] = FunStream[k])
+Object.keys(FunStream).forEach(k => { StreamPromise[k] = FunStream[k] })
 
 module.exports = StreamPromise

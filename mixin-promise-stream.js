@@ -80,7 +80,7 @@ function mixinPromise (Promise, stream) {
   // and everything else, iterating prototype doesn't
   // work on builtin promises, thus the hard coded list above.
   const methods = obj[PROMISE]
-                ? Object.keys(obj[PROMISE].__proto__).concat(Object.keys(obj[PROMISE]))
+                ? Object.keys(Object.getPrototypeOf(obj[PROMISE])).concat(Object.keys(obj[PROMISE]))
                 : Object.keys(Promise.prototype)
   methods.forEach(name => {
     if (name[0] === '_') return

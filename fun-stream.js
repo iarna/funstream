@@ -176,4 +176,3 @@ function mixinFun (stream, opts) {
   return obj
 }
 module.exports = FunStream
-

@@ -80,7 +80,7 @@ function streamTests (test, create, results) {
                 return cb(null, tw(v1, v2))
               }
             } else {
-              throw 'Unsupported arity: ' + tw.length
+              throw new Error('Unsupported arity: ' + tw.length)
             }
           }
         }
@@ -149,7 +149,7 @@ function promiseTests (test, create, results) {
                 return cb(null, tw(v1, v2))
               }
             } else {
-              throw 'Unsupported arity: ' + tw.length
+              throw new Error('Unsupported arity: ' + tw.length)
             }
           }
         }
@@ -184,7 +184,6 @@ class TestGroup {
   }
   maybe (fn, todo) {
     const skip = this.type + 'Skip'
-    const r = this.results[fn] || {}
     if (!this.results[fn] || this.results[fn][skip]) {
       return
     }

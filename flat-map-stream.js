@@ -25,8 +25,8 @@ class FlatMapStreamAsync extends FunTransform {
       if (err) return next(err)
       if (Array.isArray(results)) {
         results.forEach(v => this.push(v))
-      } else if (results && typeof results == 'object' && Symbol.iterator in results) {
-        const ii = results[Symbol.iterator]();
+      } else if (results && typeof results === 'object' && Symbol.iterator in results) {
+        const ii = results[Symbol.iterator]()
         while (true) {
           const rr = ii.next()
           if (rr.done) break
@@ -56,8 +56,8 @@ class FlatMapStreamSync extends FunTransform {
       const results = this[MAP](data)
       if (Array.isArray(results)) {
         results.forEach(v => this.push(v))
-      } else if (results && typeof results == 'object' && Symbol.iterator in results) {
-        const ii = results[Symbol.iterator]();
+      } else if (results && typeof results === 'object' && Symbol.iterator in results) {
+        const ii = results[Symbol.iterator]()
         while (true) {
           const rr = ii.next()
           if (rr.done) break
