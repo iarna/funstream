@@ -10,7 +10,7 @@
   "author": "Rebecca Turner <me@re-becca.org> (http://re-becca.org/)",
   "license": "ISC",
   "dependencies": {
-    "isa-stream": "^1.0.1"
+    "isa-stream": "^1.1.1"
   },
   "devDependencies": {
     "benchmark": "^2.1.4",
