@@ -126,7 +126,7 @@ class StreamPromise extends FunStream {
     if (!this[STREAM]) this[MAKEME]()
     const forwardError = err => {
       if (err.src === undefined) err.src = this
-      into.emit('error', err)
+      dest.emit('error', err)
     }
     this.on('error', forwardError)
     const wrapped = fun(this[STREAM].pipe(dest, opts), this[OPTS])
