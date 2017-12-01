@@ -28,6 +28,7 @@ class StreamPromise extends FunStream {
     this[STREAM] = new PassThrough(Object.assign({objectMode: true}, this[OPTS]))
     this[PROMISE].then(promised => {
       const srcStream = fun(is.plainObject(promised) ? [promised] : promised)
+      if (promised == null) srcStream.end()
       return StreamPromise.isFun(srcStream) ? srcStream.pipe(this) : this.pipe(srcStream)
     }).catch(err => this.emit('error', err))
   }
