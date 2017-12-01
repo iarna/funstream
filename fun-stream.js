@@ -110,12 +110,7 @@ class FunStream {
     return this.sync(o => o.reduceToArray((acc, val) => acc.push(val), opts))
   }
   grab (whenDone, opts) {
-    let grabStream = fun(this.list().then(v => {
-      const result = whenDone(v)
-      grabStream.emit('result', result)
-      return result
-    }))
-    return grabStream
+    return fun(this.list().then(v => whenDone(v)))
   }
   sort (sortWith, opts) {
     return this.grab(v => v.sort(sortWith))
