@@ -38,8 +38,8 @@ class FilterStreamAsync extends FunTransform {
 
       const result = this.filters[nextFilter](data, handleResult)
       if (result && result.then) return result.then(keep => handleResult(null, keep), handleResult)
-    } catch (ex) {
-      return next(ex)
+    } catch (err) {
+      return next(err)
     }
   }
   filter (filterWith, opts) {
@@ -64,8 +64,8 @@ class FilterStreamSync extends FunTransform {
         this.push(data, encoding)
       }
       next()
-    } catch (ex) {
-      next(ex)
+    } catch (err) {
+      next(err)
     }
   }
   filter (filterWith, opts) {

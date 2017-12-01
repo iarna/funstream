@@ -38,8 +38,8 @@ class MapStreamAsync extends FunTransform {
       }
       const result = this[MAPS][nextMap](data, handleResult)
       if (result && result.then) return result.then(keep => handleResult(null, keep), handleResult)
-    } catch (ex) {
-      next(ex)
+    } catch (err) {
+      next(err)
     }
   }
   map (mapWith, opts) {
@@ -62,8 +62,8 @@ class MapStreamSync extends FunTransform {
     try {
       this.push(this[MAPS].reduce((data, fn) => fn(data), data))
       next()
-    } catch (ex) {
-      next(ex)
+    } catch (err) {
+      next(err)
     }
   }
   map (mapWith, opts) {

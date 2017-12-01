@@ -16,8 +16,8 @@ class FunGenerator extends Readable {
         let current = this[ITER].next()
         if (current.done) return this.push(null)
         if (!this.push(current.value)) return
-      } catch (ex) {
-        this.emit('error', ex)
+      } catch (err) {
+        this.emit('error', err)
         return
       }
     }

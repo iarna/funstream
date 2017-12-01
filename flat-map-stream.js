@@ -40,8 +40,8 @@ class FlatMapStreamAsync extends FunTransform {
     try {
       const result = this[MAP](data, handleResult)
       if (result && result.then) return result.then(keep => handleResult(null, keep), handleResult)
-    } catch (ex) {
-      return handleResult(ex)
+    } catch (err) {
+      return handleResult(err)
     }
   }
 }
@@ -67,8 +67,8 @@ class FlatMapStreamSync extends FunTransform {
         this.push(results)
       }
       next()
-    } catch (ex) {
-      next(ex)
+    } catch (err) {
+      next(err)
     }
   }
 }

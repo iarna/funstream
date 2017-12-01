@@ -23,7 +23,7 @@ Object.defineProperty(fun, 'FunStream', {
 
 try {
   fun.Promise = require('bluebird')
-} catch (ex) {
+} catch (_) {
   fun.Promise = Promise
 }
 
