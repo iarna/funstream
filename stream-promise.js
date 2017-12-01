@@ -4,6 +4,8 @@ const FunStream = require('./fun-stream.js')
 const PROMISE = require('./mixin-promise-stream.js').PROMISE
 const STREAM = Symbol('stream')
 const MAKEME = Symbol('makeme')
+const PIPES = Symbol('pipes')
+const UNPIPE = Symbol('unpipe')
 const OPTS = FunStream.OPTS
 const PassThrough = require('stream').PassThrough
 const mixinPromiseStream = require('./mixin-promise-stream')
@@ -18,6 +20,8 @@ class StreamPromise extends FunStream {
     const P = Object.getPrototypeOf(promise) === Promise.prototype ? Promise : opts.Promise
     mixinPromiseStream(P, this)
     this.init(this, opts)
+    this[PIPES] = new Map()
+    this[UNPIPE] = []
   }
 
   [MAKEME] () {
@@ -119,7 +123,15 @@ class StreamPromise extends FunStream {
   }
   pipe (dest, opts) {
     if (!this[STREAM]) this[MAKEME]()
-    return this[STREAM].pipe(dest, opts)
+    const forwardError = err => {
+      if (err.src === undefined) err.src = this
+      into.emit('error', err)
+    }
+    this.on('error', forwardError)
+    const wrapped = fun(this[STREAM].pipe(dest, opts), this[OPTS])
+    this[UNPIPE].push([wrapped, dest])
+    this[PIPES].set(dest, forwardError)
+    return wrapped
   }
   read (size) {
     if (!this[STREAM]) this[MAKEME]()
@@ -137,7 +149,18 @@ class StreamPromise extends FunStream {
   }
   unpipe (dest) {
     if (!this[STREAM]) this[MAKEME]()
-    return this[STREAM].unpipe(dest)
+    const real = this[UNPIPE].filter(p => p[0] === dest)[0]
+    if (real) dest = real[1]
+    const result = this[STREAM].unpipe(dest)
+    const pipes = dest ? [dest] : this[PIPES].keys()
+    pipes.forEach(pipe => {
+      const real = this[UNPIPE].filter(p => p[0] === pipe)[0]
+      const dest = real ? real[1] : pipe
+      this[UNPIPE] = this[UNPIPE].filter(p => p[0] !== dest && p[1] !== dest)
+      const listener = this[PIPES].get(dest)
+      if (listener) this[STREAM].removeListener('error', listener)
+      this[PIPES].delete(dest)
+    })
   }
   unshift (chunk) {
     if (!this[STREAM]) this[MAKEME]()
