@@ -72,6 +72,9 @@ function mixinPromise (Promise, stream) {
     }
   }
 
+  // the fun-stream ways of requesting a promise are passthroughs
+  obj.ended = obj.finished = function () { return this }
+
   // the core interface
   for (let name of ['then', 'catch']) {
     let func = obj[PROMISE] ? obj[PROMISE][name] : Promise.prototype[name]

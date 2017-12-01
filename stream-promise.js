@@ -27,6 +27,17 @@ class StreamPromise extends FunStream {
       return StreamPromise.isFun(srcStream) ? srcStream.pipe(this) : this.pipe(srcStream)
     }).catch(err => this.emit('error', err))
   }
+
+  result () {
+    return this
+  }
+  finished () {
+    return this
+  }
+  ended () {
+    return this
+  }
+
   // EventEmitter
   eventNames () {
     if (!this[STREAM]) this[MAKEME]()

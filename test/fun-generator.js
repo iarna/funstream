@@ -17,7 +17,6 @@ test('identity', t => {
   const gen = fun(fromArray([1, 2, 3]))
   t.is(Boolean(isaReadable(gen)), true, 'fun-generator: is readable')
   t.is(Boolean(isaWritable(gen)), false, 'fun-generator: is not writable')
-  t.is(Boolean(gen.then), true, 'fun-generator: is promise')
   t.is(Boolean(FunStream.isFun(gen)), true, 'fun-generator: isFun')
   t.done()
 })

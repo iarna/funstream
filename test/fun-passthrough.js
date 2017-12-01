@@ -22,7 +22,6 @@ test('identity', t => {
   const gen = fromArray([1, 2, 3])
   t.is(Boolean(isaReadable(gen)), true, 'fun-passthrough: is readable')
   t.is(Boolean(isaWritable(gen)), true, 'fun-passthrough: is writable')
-  t.is(Boolean(gen.then), true, 'fun-passthrough: is promise')
   t.is(Boolean(FunStream.isFun(gen)), true, 'fun-passthrough: isFun')
   t.done()
 })

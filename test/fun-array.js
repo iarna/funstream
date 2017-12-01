@@ -11,7 +11,6 @@ test('identity', t => {
   const arr = fun([1, 2, 3])
   t.is(Boolean(isaReadable(arr)), true, 'fun-array: is readable')
   t.is(Boolean(isaWritable(arr)), false, 'fun-array: is not writable')
-  t.is(Boolean(arr.then), true, 'fun-array: is promise')
   t.is(Boolean(FunStream.isFun(arr)), true, 'fun-array: isFun')
   t.done()
 })
