@@ -152,7 +152,7 @@ class StreamPromise extends FunStream {
     if (!this[STREAM]) this[MAKEME]()
     const real = this[UNPIPE].filter(p => p[0] === dest)[0]
     if (real) dest = real[1]
-    const result = this[STREAM].unpipe(dest)
+    this[STREAM].unpipe(dest)
     const pipes = dest ? [dest] : this[PIPES].keys()
     pipes.forEach(pipe => {
       const real = this[UNPIPE].filter(p => p[0] === pipe)[0]
