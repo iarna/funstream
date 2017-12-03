@@ -184,6 +184,23 @@ without constructing additional streams, so:
 The second `filter` call actually returns the same stream object.  This does
 mean that if you try to fork the streams in between it won't work. Sorry.
 
+### .async() → this
+### .sync() → this
+
+Sets the stream `async` stream option to true and false respectively.
+
+### .async(todo) → FunStream
+### .sync(todo) → FunStream
+
+Runs `todo` with a stream with the appropriate `async` option set.  The
+returned value is restored to the previous setting.
+
+```
+fun([1,2,3])
+  .filter(async n => n > 0)
+  .sync(str => str.filter(n => n < 3).map(n => n * 2))
+```
+
 ### .ended() → Promise
 
 Returns a Promise that resolves when the stream emits an `end` event.  If
