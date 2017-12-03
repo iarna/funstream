@@ -1,9 +1,5 @@
 'use strict'
 const fun = require('./index.js')
-const OPTS = Symbol('opts')
-const ISFUN = Symbol('isFun')
-const OURPROMISE = Symbol('ourPromise')
-const RESULT = Symbol('result')
 const mixinPromiseStream = require('./mixin-promise-stream.js')
 const is = require('isa-stream')
 let FilterStream
@@ -12,25 +8,33 @@ let FlatMapStream
 let ReduceStream
 let ForEachStream
 
+const OPTS = Symbol('opts')
+const ISFUN = Symbol('isFun')
+const PROMISES = Symbol('promises')
+const RESULT = Symbol('result')
 class FunStream {
   init (opts) {
     this[OPTS] = Object.assign({Promise: Promise}, opts || {})
     this[ISFUN] = true
-    this[OURPROMISE] = null
+    this[PROMISES] = {}
     this[RESULT] = null
   }
   ended () {
-    return this.finished()
+    if (!is.Readable(this)) throw new TypeError('This stream is not a readable stream, it will not end. Try `.finished()` instead.')
+    if (this[PROMISES].ended) return this[PROMISES].ended
+    return this[PROMISES].ended = new this[OPTS].Promise((resolve, reject) => {
+      this.once('error', reject)
+      this.once('end', () => setImmediate(resolve, this[RESULT]))
+    })
   }
   finished () {
-    if (this[OURPROMISE]) return this[OURPROMISE]
-    return this[OURPROMISE] = new this[OPTS].Promise((resolve, reject) => {
+    if (!is.Writable(this)) throw new TypeError('This stream is not a writable stream, it will not finish. Try `.ended()` instead.')
+    if (this[PROMISES].finished) return this[PROMISES].finished
+    return this[PROMISES].finished = new this[OPTS].Promise((resolve, reject) => {
       this.once('error', reject)
-      if (is.Readable(this)) {
-        this.once('end', () => setImmediate(resolve, this[RESULT]))
-      } else {
-        this.once('finish', () => setImmediate(resolve, this[RESULT]))
-      }
+      this.once('finish', () => setImmediate(resolve, this[RESULT]))
+    })
+  }
     })
   }
   async (todo) {
@@ -161,8 +165,12 @@ function mixinFun (stream, opts) {
     FunStream.funInit.call(obj, opts)
   }
 
-  if (!cls || !obj.finished) obj.finished = FunStream.prototype.finished
-  if (!cls || !obj.ended) obj.ended = FunStream.prototype.ended
+  if (is.Writable(obj)) {
+    if (!cls || !obj.finished) obj.finished = FunStream.prototype.finished
+  }
+  if (is.Readable(obj)) {
+    if (!cls || !obj.ended) obj.ended = FunStream.prototype.ended
+  }
   if (!cls || !obj.filter) obj.filter = FunStream.prototype.filter
   if (!cls || !obj.map) obj.map = FunStream.prototype.map
   if (!cls || !obj.flat) obj.flat = FunStream.prototype.flat

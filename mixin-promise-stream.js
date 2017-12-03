@@ -1,5 +1,7 @@
 'use strict'
 module.exports = mixinPromise
+const is = require('isa-stream')
+
 const PROMISE = Symbol('promise')
 const MAKEPROMISE = Symbol('makePromise')
 
@@ -16,11 +18,11 @@ function mixinPromise (Promise, stream) {
     let error
     const onError = err => { error = err }
     obj.once('error', onError)
-    if ('write' in stream) {
-      let finished = false
+    if (is.Writable(stream)) {
       let result
       const onEarlyResult = value => { result = value }
       obj.once('result', onEarlyResult)
+      let finished = false
       const onEarlyFinish = () => setImmediate(() => { finished = true })
       obj.once('finish', onEarlyFinish)
       obj[MAKEPROMISE] = function () {
@@ -74,8 +76,11 @@ function mixinPromise (Promise, stream) {
 
   // the fun-stream ways of requesting a promise are passthroughs
   const nop = function () { return this }
-  if (!obj.ended) obj.ended = nop
-  if (!obj.finished) obj.finished = nop
+  if (is.Writable(obj)) {
+    obj.finished = nop
+  } else {
+    obj.ended = nop
+  }
 
   // the core interface
   for (let name of ['then', 'catch']) {
