@@ -91,16 +91,11 @@ its only argument, chain off of that as you like and return the result.  The
 stream returned by `fun()` will write to that first FunStream and read from
 the end of your chain. (With the usual error propagation.)
 
-### fun(writableStream[, opts]) → FunStream
+### fun(writableStream[, opts]) → PromiseStream
 
 Writable streams can't be fun per se, since being fun means having
-iterators.  But they can at least promise their results.  If you make a
-writable stream fun then you'll get a stream/promise hybrid.  All the power
-of a stream, but with the promise methods of your favorite promise
-implementation.  The promise will Resolve when the stream finishes and
-Reject if it errors.
-
-This is how `reduce` and `forEach` get their return values.
+iterators. What we can do is make them resolvable as promises, with an extra
+feature or two.
 
 ### fun(array[,opts]) → FunStream
 
@@ -148,11 +143,27 @@ Contrary to ordinary, BORING streams, we make sure errors are passed along
 when we chain into something.  This applies when you `.map` or `.filter` but
 it ALSO applies when you `.pipe`.
 
-## Funstream and Promises
+## PromiseStream methods
 
-All Funstreams are Promises that resolve when the stream is complete.
+### .finished() → Promise
 
-## Funstream methods
+Available on Writable promise streams, the returned Promise will resolved
+when the stream emits a `finish` event.  The promise will be rejected if the
+stream emits an `error` event.
+
+If the stream emits a `result` event then the stream will resolve with that
+value.
+
+### .closed() → Promise
+
+Available on Writable promise streams, the returned Promise will resolved
+when the stream emits a `close` event.  The promise will be rejected if the
+stream emits an `error` event.
+
+NOTE: Not all streams emit a `close` event and if you use this on a stream
+that does not then it will never resolve.
+
+## FunStream methods
 
 This is the good stuff.  All callbacks can be sync or async.  You can
 indicate this by setting the `async` property on the opts object either when
@@ -170,6 +181,11 @@ without constructing additional streams, so:
 
 The second `filter` call actually returns the same stream object.  This does
 mean that if you try to fork the streams in between it won't work. Sorry.
+
+### .ended() → Promise
+
+Returns a Promise that resolves when the stream emits an `end` event.  If
+the stream emits an `error` event then it will reject.
 
 ### .pipe(target[, opts]) → FunStream(target)
 
@@ -255,6 +271,10 @@ fun(stream)
 
 ### .grab(grabWith, opts) → FunStream
 
+WARNING: This has to load all of your content into memory in order to sort
+it, so be sure to do your filtering or limiting (with `.head`) before you
+call this. This results in a funstream fed from the sorted array.
+
 `grabWith` is a synchronous function. It takes an array as an argument and
 turns the return value back into a stream with `fun()`. The array
 is produced by reading the entire stream, so be warned.
@@ -325,7 +345,7 @@ fun(stream)
   .reduce((acc, value) => { reduceWith(acc, value) ; return acc }, {})
 ```
 
-### .forEach(consumeWith[, opts]) → FunStream
+### .forEach(consumeWith[, opts]) → PromiseStream
 
 Run some code for every chunk, promise that the stream is done.
 
