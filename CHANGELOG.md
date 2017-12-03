@@ -1,3 +1,25 @@
+# 3.0.0
+
+I'm doing a 3.0.0 to backout the feature added in 2.3.0 where Readable
+streams were thenable.
+
+This turns out to be very unfun.  Specifically it means that async functions
+can't return fun-streams, something I very much want to do.
+
+Because it's still sometimes nice to get a promise in these circumstances,
+you can ask for one with a few ways:
+
+`.finished()` is available on writable and duplex streams and resolves when the stream
+emits `finish`.  Is is a no-op on writable streams, as they already are a
+promise that resolves when the stream emits `finish`.
+
+`.ended()` is available on readable and duplex streams and resolves when the
+stream emits `end`.
+
+`.closed()` is available on writable and duplex streams and resolves when the
+stream emits `close`.  Note that not all streams emit `close` and if this is
+one of those then the promise will never resolve.
+
 # 2.6.1
 
 * Revert: Patch to preserve funopts confuses itself.
@@ -54,7 +76,7 @@
 New features!
 
 * All streams are promises: `fun(mystream).then(…)` will wait wait for your
-  tream to `end` in the case of read streams or `finish` in the case of
+  stream to `end` in the case of read streams or `finish` in the case of
   write and duplex streams.
   There's no overhead to this: No promise is constructed if you don't call
   a promise method on the resulting objects.
