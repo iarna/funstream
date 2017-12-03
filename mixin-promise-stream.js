@@ -3,6 +3,7 @@ module.exports = mixinPromise
 const is = require('isa-stream')
 
 const PROMISE = Symbol('promise')
+const CLOSEPROMISE = Symbol('closePromise')
 const MAKEPROMISE = Symbol('makePromise')
 
 mixinPromise.PROMISE = PROMISE
@@ -15,6 +16,7 @@ function mixinPromise (Promise, stream) {
 
   if (!(PROMISE in obj)) {
     obj[PROMISE] = null
+    obj[CLOSEPROMISE] = null
     let error
     const onError = err => { error = err }
     obj.once('error', onError)
@@ -29,6 +31,7 @@ function mixinPromise (Promise, stream) {
         if (error) {
           this.removeListener('result', onEarlyResult)
           this.removeListener('finish', onEarlyFinish)
+          this.removeListener('close', onEarlyClose)
           this[PROMISE] = Promise.reject(error)
         } else if (result || finished) {
           this.removeListener('error', onError)
@@ -44,6 +47,24 @@ function mixinPromise (Promise, stream) {
             this.once('error', reject)
           })
         }
+      }
+      let closed = false
+      const onEarlyClose = () => setImmediate(() => { closed = true })
+      obj.once('close', onEarlyClose)
+      obj.closed = function () {
+        if (!is.Writable(this)) throw new TypeError('This stream is not a writable stream, it will not close. Try `.ended()` instead.')
+        if (this[CLOSEPROMISE]) return this[CLOSEPROMISE]
+        if (error) {
+          this.removeListener('close', onEarlyFinish)
+          return this
+        }
+        if (closed) return this[CLOSEPROMISE] = Promise.resolve()
+
+        return this[CLOSEPROMISE] = new Promise((resolve, reject) => {
+          this.removeListener('close', onEarlyFinish)
+          this.once('error', reject)
+          this.once('close', resolve)
+        })
       }
     } else {
       let ended = false

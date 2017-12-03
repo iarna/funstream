@@ -35,6 +35,12 @@ class FunStream {
       this.once('finish', () => setImmediate(resolve, this[RESULT]))
     })
   }
+  closed () {
+    if (!is.Writable(this)) throw new TypeError('This stream is not a writable stream, it will not close. Try `.ended()` instead.')
+    if (this[PROMISES].closed) return this[PROMISES].closed
+    return this[PROMISES].closed = new this[OPTS].Promise((resolve, reject) => {
+      this.once('error', reject)
+      this.once('close', resolve)
     })
   }
   async (todo) {
@@ -167,6 +173,7 @@ function mixinFun (stream, opts) {
 
   if (is.Writable(obj)) {
     if (!cls || !obj.finished) obj.finished = FunStream.prototype.finished
+    if (!cls || !obj.closed) obj.closed = FunStream.prototype.closed
   }
   if (is.Readable(obj)) {
     if (!cls || !obj.ended) obj.ended = FunStream.prototype.ended
