@@ -118,6 +118,8 @@ Returns a funstream that will consume the result of the promise exactly as
 the equivalent plain value would be.  No data will be emitted until the promise
 resolves. If it rejects it will be propagated as an error in the usual ways.
 
+These are special, because the returned object only lazily becomes a stream. If you
+treat it as a promise then no stream construction occurs.
 
 ### fun([opts]) → FunStream
 
