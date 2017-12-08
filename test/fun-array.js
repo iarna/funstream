@@ -46,5 +46,25 @@ promiseTests(test, () => fun([1, 2, 3]), {
   list: {expected: [1, 2, 3]},
   grab: {create: () => fun([3, 2, 1]), with: [v => v.sort()], expected: [1, 2, 3], asyncSkip: true},
   sort: {create: () => fun([7, 6, 5]), expected: [5, 6, 7], asyncSkip: true},
-  concat: {expected: '123', asyncSkip: true}
+  concat: {expected: '123', asyncSkip: true},
+})
+
+test('backpressure', (t) => {
+  const astr = fun(new Array(20))
+  let lastSeen = (new Date()).valueOf()
+  let gaps = []
+  astr.on('data', data => {
+    const seen = (new Date()).valueOf()
+    gaps.push(seen - lastSeen)
+    lastSeen = seen
+  })
+  astr.map((data, cb) => {
+    setTimeout(cb, 20, null, '')
+  }).concat().then(v => {
+    t.is(v, '', 'Empty map is empty')
+    const maxGap = Math.max.apply(null, gaps)
+    t.ok(maxGap > 200, 'Backpressure slowed stream')
+    t.comment(maxGap)
+    t.done()
+  })
 })
