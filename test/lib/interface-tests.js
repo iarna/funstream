@@ -12,29 +12,35 @@ const testCases = qw`
 
 function streamTests (test, create, results) {
   test('stream', t => {
-    t.test('pipe', t => {
-      const target = new PassThrough({objectMode: true})
-      const testcase = create().pipe(target)
-      return streamContent(testcase).then(content => {
-        t.is(Boolean(target.then), true, 'target stream was promisified')
-        t.is(Boolean(FunStream.isFun(target)), true, 'target stream was funified')
-        t.isDeeply(content, results.pipe.expected, 'target stream content is correct')
+    if (results.pipe) {
+      t.test('pipe', t => {
+        const target = new PassThrough({objectMode: true})
+        const testcase = create().pipe(target)
+        return streamContent(testcase).then(content => {
+          t.is(Boolean(target.then), true, 'target stream was promisified')
+          t.is(Boolean(FunStream.isFun(target)), true, 'target stream was funified')
+          t.isDeeply(content, results.pipe.expected, 'target stream content is correct')
+        })
       })
-    })
-    t.test('head', t => {
-      const testcase = create().head(2)
-      return streamContent(testcase).then(content => {
-        t.isDeeply(content, results.head.expected, 'target stream content is correct')
+    }
+    if (results.head) {
+      t.test('head', t => {
+        const testcase = create().head(2)
+        return streamContent(testcase).then(content => {
+          t.isDeeply(content, results.head.expected, 'target stream content is correct')
+        })
       })
-    })
-    t.test('forEach (sync)', t => {
-      const calledWith = []
-      return create().forEach(v => {
-        calledWith.push(v)
-      }).then(() => {
-        t.isDeeply(calledWith, results.forEach.expected, 'foreach was called with each value')
+    }
+    if (results.forEach) {
+      t.test('forEach (sync)', t => {
+        const calledWith = []
+        return create().forEach(v => {
+          calledWith.push(v)
+        }).then(() => {
+          t.isDeeply(calledWith, results.forEach.expected, 'foreach was called with each value')
+        })
       })
-    })
+    }
     t.test('forEach (async)', t => {
       const calledWith = []
       return create().forEach((v, cb) => {
