@@ -24,11 +24,19 @@ function isScalar (value) {
 }
 
 function isIterator (value) {
-  return Symbol.iterator in value && 'next' in value
+  try {
+    return Symbol.iterator in value && 'next' in value
+  } catch (_) {
+    return false
+  }
 }
 
 function isThenable (value) {
-  return 'then' in value
+  try {
+    return 'then' in value
+  } catch (_) {
+    return false
+  }
 }
 
 function isPlainObject (value) {
