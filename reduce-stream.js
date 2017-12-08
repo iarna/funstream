@@ -53,7 +53,7 @@ class ReduceStreamSync extends MiniSyncSink {
       try {
         this.acc = this.reduceWith(this.acc, data)
       } catch (err) {
-        this.emit(err)
+        this.emit('error', err)
         return false
       }
     }
