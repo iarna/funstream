@@ -5,13 +5,13 @@ Funstream gives you iteratorish methods on your streams.
 ```js
 const fun = require('funstream')
 
-fun([1, 2, 3, 4, 5])
+fun(boringStream)
   .map(n => n + 1)
   .filter(n => n % 2)
   .map(n => `${n}\n`)
   .pipe(process.stdout)
 // prints lines with 3 and 5
-fun([1, 2, 3, 4, 5])
+fun(boringStream)
   .map(n => n + 1)
   .filter(n => n % 2)
   .reduce((a, b) => a + b)
