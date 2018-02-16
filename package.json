@@ -4,7 +4,7 @@
   "description": "Funstream gives you iteratorish methods on your streams.",
   "main": "index.js",
   "scripts": {
-    "test": "eslint *.js test/**/*.js && tap test/*.js"
+    "test": "eslint *.js test/**/*.js && tap -J --100 test/*.js"
   },
   "keywords": [],
   "author": "Rebecca Turner <me@re-becca.org> (http://re-becca.org/)",
