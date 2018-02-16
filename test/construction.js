@@ -3,7 +3,6 @@ const test = require('tap').test
 const fun = require('..')
 const FunStream = fun.FunStream
 const stream = require('stream')
-const Promise = require('bluebird')
 const is = require('../is.js')
 
 test('construction', t => {
@@ -64,13 +63,13 @@ test('construction', t => {
 test('promised construction', t => {
   const resolutions = []
   function hasValue (stream, value, label) {
-    resolutions.push(stream.concat().then(v => t.is(v, value, `Promised ${label} has expected value`)))
+    resolutions.push(stream.concat().then(v => t.is(v, value, `Promise ${label} has expected value`)))
   }
   function assertFun (make, value, label) {
     const result = make()
-    t.is(FunStream.isFun(result), true, `Promised ${label} is fun`)
-    t.is(is.Readable(result), true, `Promised ${label} is readable`)
-    t.is(is.Writable(result), true, `Promised ${label} is writable`)
+    t.is(FunStream.isFun(result), true, `Promise ${label} is fun`)
+    t.is(is.Readable(result), true, `Promise ${label} is readable`)
+    t.is(is.Writable(result), true, `Promise ${label} is writable`)
     hasValue(result, value, label)
   }
   function funAndEnd () {
@@ -97,21 +96,21 @@ test('promised construction', t => {
   assertFun(() => fun(Promise.resolve(new stream.Readable({read () { this.push('hi'); this.push(null) }}))), 'hi', 'fun(Readable)')
 
   const writableFun = fun(Promise.resolve(new stream.Writable({write () { return true }})))
-  t.is(FunStream.isFun(writableFun), true, "Promised fun(Writable) is fun (because we don't know any better)")
-  t.is(typeof writableFun.pause, 'function', "Promised fun(Writable) is readable (because we don't know any better)")
-  t.is(typeof writableFun.write, 'function', 'Promised fun(Writable) is writable')
-  t.is(typeof writableFun.then, 'function', 'Promised fun(Writable) IS thenable (because everything always is)')
+  t.is(FunStream.isFun(writableFun), true, "Promise fun(Writable) is fun (because we don't know any better)")
+  t.is(typeof writableFun.pause, 'function', "Promise fun(Writable) is readable (because we don't know any better)")
+  t.is(typeof writableFun.write, 'function', 'Promise fun(Writable) is writable')
+  t.is(typeof writableFun.then, 'function', 'Promise fun(Writable) IS thenable (because everything always is)')
 
   const value = {}
   const rejectedFun = fun(Promise.resolve(value))
-  rejectedFun.on('data', v => t.is(v, value, 'Promised object was streamed through verbatum'))
+  rejectedFun.on('data', v => t.is(v, value, 'Promise object was streamed through verbatum'))
   resolutions.push(new Promise(resolve => {
     rejectedFun.on('error', err => {
-      t.ifError(err, 'Promised objects are streamed w/o errors')
+      t.ifError(err, 'Promise objects are streamed w/o errors')
       resolve()
     })
     rejectedFun.on('finish', () => {
-      t.pass('Promised objects are streamed w/o errors')
+      t.pass('Promise objects are streamed w/o errors')
       resolve()
     })
   }))
