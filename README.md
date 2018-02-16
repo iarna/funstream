@@ -325,6 +325,14 @@ It's just sugar for: `reduceToArray((acc, val) => acc.push(val), opts)`
 
 Promise a string produced by concatenating all of the values in the stream.
 
+### .json(opts) → FunStream
+
+Promise an object produced by JSON parsing the result of `.concat()`. Sugar for:
+
+```js
+stream.concat().then(str => JSON.parse(str))
+```
+
 ### .reduce(reduceWith[, initial[, opts]]) → FunStream
 
 Promise the result of computing everything.

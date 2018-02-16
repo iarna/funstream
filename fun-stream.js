@@ -128,6 +128,9 @@ class FunStream {
   concat (opts) {
     return this.sync(o => o.reduce((acc, val) => acc + String(val), '', opts))
   }
+  json (opts) {
+    return this.concat().then(str => JSON.parse(str))
+  }
   forEach (forEachWith, forEachOpts) {
     if (!ForEachStream) ForEachStream = require('./for-each-stream.js')
     const opts = Object.assign({}, this[OPTS], forEachOpts || {})
@@ -188,6 +191,7 @@ function mixinFun (stream, opts) {
   if (!cls || !obj.reduceToArray) obj.reduceToArray = FunStream.prototype.reduceToArray
   if (!cls || !obj.reduceToObject) obj.reduceToObject = FunStream.prototype.reduceToObject
   if (!cls || !obj.concat) obj.concat = FunStream.prototype.concat
+  if (!cls || !obj.json) obj.json = FunStream.prototype.json
   if (!cls || !obj.list) obj.list = FunStream.prototype.list
   if (!cls || !obj.grab) obj.grab = FunStream.prototype.grab
   if (!cls || !obj.sort) obj.sort = FunStream.prototype.sort
