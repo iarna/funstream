@@ -344,11 +344,14 @@ It's the equivalent of `fun(grabWith(await stream.list()))`
 
 ### .list(opts) → FunStream
 
+Alias: `.collect(opts)`
+
 Promise an array of all of the values in the stream. Let's you do things like…
 
 ```js
 const data = await fun().map(…).filter(…).list()
 ```
+
 
 It's just sugar for: `reduceToArray((acc, val) => acc.push(val), opts)`
 

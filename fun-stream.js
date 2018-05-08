@@ -138,6 +138,8 @@ class FunStream {
   }
 }
 
+// collect (opts) is an alias of list
+FunStream.prototype.collect = FunStream.prototype.list
 FunStream.isFun = stream => Boolean(stream && stream[ISFUN])
 FunStream.mixin = mixinFun
 FunStream.isAsync = isAsync
@@ -193,6 +195,7 @@ function mixinFun (stream, opts) {
   if (!cls || !obj.concat) obj.concat = FunStream.prototype.concat
   if (!cls || !obj.json) obj.json = FunStream.prototype.json
   if (!cls || !obj.list) obj.list = FunStream.prototype.list
+  if (!cls || !obj.collect) obj.collect = FunStream.prototype.collect
   if (!cls || !obj.grab) obj.grab = FunStream.prototype.grab
   if (!cls || !obj.sort) obj.sort = FunStream.prototype.sort
   if (!cls || !obj.forEach) obj.forEach = FunStream.prototype.forEach
