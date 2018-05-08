@@ -68,3 +68,10 @@ function fun (stream, opts) {
   }
   throw new Error(`funstream invalid arguments, expected: fun([stream | array], [opts]), got: fun(${[].map.call(arguments, arg => typeof arg).join(', ')})`)
 }
+fun.with = (todo, opts) => {
+  const st = fun(opts)
+  const todoPromise = todo(st)
+  if (!todoPromise.then) throw new Error('Callback supplied to fun.with did not return a thenable (Promise) as expected.')
+  todoPromise.then(() => st.end(), err => st.emit('error', err))
+  return st
+}

@@ -126,6 +126,37 @@ treat it as a promise then no stream construction occurs.
 Make a passthrough Funstream.  You can pipe into this to get access to our
 handy methods.
 
+### fun.with(todo[, opts]) → FunStream
+
+For those times when you want to create a stream from nothing, or at least,
+from a non-stream source, `fun.with` provides any easy interface for doing
+that.
+
+Pass it a function and you'll get a stream you can write to.  You can close
+it off by just resolving your promise which is particularly convenient when
+your function is declared `async`.
+
+Constructs a passthrough funstream and passes it as an argument to `todo`.
+`todo` is a function that returns a `Promise`. When the `Promise` resolves the
+stream will end.
+
+```js
+let a
+let b = fun.with(async st => { a = st })
+a === b // true
+```
+```js
+const result = await fun.with(st => {
+  let count = 0
+  return new Promise(function each (resolve) {
+    if (++count === 5) return resolve()
+    st.write(count)
+    setTimeout(each, 100, resolve)
+  })
+}).list() // [ 0, 1, 2, 3, 4 ]
+```
+
+
 ### fun.FunStream
 
 Exactly the same as `stream.PassThrough` but with fun added.  `fun()` is
