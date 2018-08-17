@@ -3,7 +3,6 @@ let FunStream
 const FunTransform = require('./fun-transform.js')
 
 module.exports = MapStream
-
 const MAPS = Symbol('maps')
 
 function MapStream (mapWith, opts) {
@@ -14,6 +13,9 @@ function MapStream (mapWith, opts) {
     return new MapStreamSync(mapWith, opts)
   }
 }
+MapStream.Sync = MapStreamSync
+MapStream.Async = MapStreamAsync
+MapStream.MAPS = MAPS
 
 class MapStreamAsync extends FunTransform {
   constructor (mapWith, opts) {

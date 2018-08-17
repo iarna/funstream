@@ -4,6 +4,7 @@ const mixinPromiseStream = require('./mixin-promise-stream.js')
 const is = require('isa-stream')
 let FilterStream
 let MapStream
+let MutateStream
 let FlatMapStream
 let ReduceStream
 let ForEachStream
@@ -76,6 +77,11 @@ class FunStream {
     if (!MapStream) MapStream = require('./map-stream.js')
     const map = MapStream(mapWith, opts ? Object.assign(this[OPTS], opts) : this[OPTS])
     return this.pipe(map)
+  }
+  mutate (mutateWith, opts) {
+    if (!MutateStream) MutateStream = require('./mutate-stream.js')
+    const mutate = MutateStream(mutateWith, opts ? Object.assign(this[OPTS], opts) : this[OPTS])
+    return this.pipe(mutate)
   }
   flat (opts) {
     return this.sync(o => o.flatMap(v => v, opts))
@@ -185,6 +191,7 @@ function mixinFun (stream, opts) {
   }
   if (!cls || !obj.filter) obj.filter = FunStream.prototype.filter
   if (!cls || !obj.map) obj.map = FunStream.prototype.map
+  if (!cls || !obj.mutate) obj.mutate = FunStream.prototype.mutate
   if (!cls || !obj.flat) obj.flat = FunStream.prototype.flat
   if (!cls || !obj.flatMap) obj.flatMap = FunStream.prototype.flatMap
   if (!cls || !obj.head) obj.head = FunStream.prototype.head

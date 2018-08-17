@@ -43,6 +43,7 @@
     "map-stream.js",
     "mini-sync-sink.js",
     "mixin-promise-stream.js",
+    "mutate-stream.js",
     "reduce-stream.js",
     "stream-promise.js"
   ],

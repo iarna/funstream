@@ -276,6 +276,10 @@ Transform the stream!
 
 `data` is replaced with `newData` from `mapWith` in the output stream.
 
+### .mutate(mutateWith[, opts]) → FunStream
+
+`stream.mutate(data => {…})` is sugar for `stream.map(data => {…; return data})`
+
 ### .flat([, opts]) → FunStream
 
 Flattens arrays in the streams into object emissions! That is to say, a stream of two objects:
