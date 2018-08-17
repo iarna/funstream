@@ -7,6 +7,7 @@ let FunPassThrough
 let FunArray
 let FunDuplex
 let FunGenerator
+let FunAsyncGenerator
 let StreamPromise
 let mixinPromiseStream
 
@@ -47,12 +48,15 @@ function fun (stream, opts) {
     return new FunDuplex(input, output, opts)
   }
   if (typeof stream === 'object') {
-    if (is.iterator(stream)) {
-      if (!FunGenerator) FunGenerator = require('./fun-generator.js')
-      return new FunGenerator(stream, Object.assign({Promise: fun.Promise}, opts || {}))
-    } else if (is.Readable(stream)) {
+    if (is.Readable(stream)) {
       if (!FunPassThrough) FunPassThrough = require('./fun-passthrough.js')
       return FunPassThrough.mixin(stream, Object.assign({Promise: fun.Promise}, opts || {}))
+    } else if (is.asyncIterator(stream)) {
+      if (!FunAsyncGenerator) FunAsyncGenerator = require('./fun-async-generator.js')
+      return new FunAsyncGenerator(stream, Object.assign({Promise: fun.Promise}, opts || {}))
+    } if (is.iterator(stream)) {
+      if (!FunGenerator) FunGenerator = require('./fun-generator.js')
+      return new FunGenerator(stream, Object.assign({Promise: fun.Promise}, opts || {}))
     } else if (is.thenable(stream)) { // promises of fun
       if (!StreamPromise) StreamPromise = require('./stream-promise.js')
       return new StreamPromise(stream, Object.assign({Promise: fun.Promise}, opts || {}))

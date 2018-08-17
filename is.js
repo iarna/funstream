@@ -3,6 +3,7 @@ const isaStream = require('isa-stream')
 
 exports.scalar = isScalar
 exports.iterator = isIterator
+exports.asyncIterator = isAsyncIterator
 exports.thenable = isThenable
 exports.plainObject = isPlainObject
 exports.Readable = isaStream.Readable
@@ -31,6 +32,14 @@ function isIterator (value) {
   }
 }
 
+function isAsyncIterator (value) {
+  try {
+    return Symbol.asyncIterator in value && 'next' in value
+  } catch (_) {
+    return false
+  }
+}
+
 function isThenable (value) {
   try {
     return 'then' in value
@@ -45,6 +54,7 @@ function isPlainObject (value) {
   if (Array.isArray(value)) return false
   if (Buffer.isBuffer(value)) return false
   if (isIterator(value)) return false
+  if (isAsyncIterator(value)) return false
   if (isaStream.Readable(value)) return false
   if (isaStream.Writable(value)) return false
   if (isThenable(value)) return false

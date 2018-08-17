@@ -5,24 +5,34 @@ Funstream gives you iteratorish methods on your streams.
 ```js
 const fun = require('funstream')
 
+/***** USAGE EXAMPLES *****/
+
+// Make a stream, fun, then run some list comprehensions on it
 fun(boringStream)
   .map(n => n + 1)
   .filter(n => n % 2)
   .map(n => `${n}\n`)
   .pipe(process.stdout)
-// prints lines with 3 and 5
+// it's still a stream all the way through so each chunk is processed as its read
+
+// funstreams are also promises, which is particularly useful when
+// collection results from something like reduce
 fun(boringStream)
   .map(n => n + 1)
   .filter(n => n % 2)
   .reduce((a, b) => a + b)
   .then(console.log)
-// prints 8
 
-// `fun()` takes all sorts of arguments…
+/***** CONSTRUCTING *****/
+
+// We can make just about anything a funstream
 // readable streams…
 fun(process.stdin)
-// Promised streams…
+
+// Promises of streams... which means you can immediately attach your body stream processing and it'll
+// start getting data once the fetch completes.
 fun(fetch('https://example.com').then(r => r.body))
+
 // generators…
 function * mygen () {
   for (let ii = 0; ii < 10000; ++ii) {
@@ -30,20 +40,45 @@ function * mygen () {
   }
 }
 fun(mygen())
+
+// async generators
+async function * myasyncgen () {
+  for (let ii = 0; ii < 10000; ++ii) {
+    yield ii
+  }
+}
+fun(myasyncgen())
+
+// and on node 10, you can iterate a funstream
+for await (let value of fun(…)) {
+  …
+}
+
 // arrays
 fun([1, 2, 3, 4])
-// writable streams are promises
+
+// even writable streams, which can be treated as promises to see when they resolve or reject
 fun(writestream)
   .then(() => console.log('finished!'))
   .catch(err => console.error('stream error', err)
-// writable streams are streams AND promises
+
+// fun writable streams are streams, continue to be writable streams even
+// though you can use them likes promises
 process.stdin.pipe(fun(writestream))
   .then(() => console.log('done!'))
 
-// If you're not so keen on mutating things, why not try piping into a piping hot fun stream?
+// fun streams can also be piped into, handy when the source stream isn't a
+// standard Node.js stream, but does implement the pipe interface.
 process.stdin.pipe(fun())
   .map(str => transformStr(str))
   .pipe(process.stdout)
+
+// You can bundle up a series of transforms into single ttransform stream
+const mytransformStream =
+  fun(stream => stream.map(str => str.toUpperCase).
+                       flatMap(v = [v, v]))
+
+/***** ADDED METHODS *****/
 
 // Fun functions can be sync…
 .map(str => str.slice(10))
@@ -52,16 +87,10 @@ process.stdin.pipe(fun())
 .map(async str => (await transformStr(str)).slice(10))
 
 // Fun functions can be promise returning…
-.map(str => transformStr(str))
+.map(str => transformStr(str), {async: true})
 
 // Fun functions can be callback using…
-.async().map((str, cb) => transformStrCB(str, cb))
-
-// And you can bundle up some transforms into a transform stream:
-const mytransformStream =
-  fun(stream => stream.map(str => str.toUpperCase).
-                       flatMap(v = [v, v]))
-
+.map((str, cb) => transformStrCB(str, cb), {async: true})
 ```
 
 Funstream makes object streams better.
@@ -107,9 +136,14 @@ while respecting back pressure.
 Returns a funstream that will receive entries from the array one at a time
 while respecting back pressure.
 
-### fun(generator[,opts]) → FunStream
+### fun(iterator[,opts]) → FunStream
 
-Returns a funstream that will receive values from the generator one at a time
+Returns a funstream that will receive values from the iterator one at a time
+while respecting back pressure.
+
+### fun(asyncIterator[,opts]) → FunStream
+
+Returns a funstream that will receive values from the async iterator one at a time
 while respecting back pressure.
 
 ### fun(promise[,opts]) → FunStream
@@ -155,7 +189,6 @@ const result = await fun.with(st => {
   })
 }).list() // [ 0, 1, 2, 3, 4 ]
 ```
-
 
 ### fun.FunStream
 
