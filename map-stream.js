@@ -13,8 +13,6 @@ function MapStream (mapWith, opts) {
     return new MapStreamSync(mapWith, opts)
   }
 }
-MapStream.Sync = MapStreamSync
-MapStream.Async = MapStreamAsync
 MapStream.MAPS = MAPS
 
 class MapStreamAsync extends FunTransform {
@@ -54,6 +52,7 @@ class MapStreamAsync extends FunTransform {
     }
   }
 }
+MapStream.Async = MapStreamAsync
 
 class MapStreamSync extends FunTransform {
   constructor (mapWith, opts) {
@@ -78,3 +77,4 @@ class MapStreamSync extends FunTransform {
     }
   }
 }
+MapStream.Sync = MapStreamSync
