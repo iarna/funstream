@@ -11,6 +11,7 @@ class MiniSyncSink extends EventEmitter {
   write (data, encoding, next) {
     try {
       this._write(data, encoding)
+      /* istanbul ignore next */
       if (next) next()
       return true
     } catch (err) {

@@ -57,6 +57,7 @@ class ReduceStreamSync extends MiniSyncSink {
         return false
       }
     }
+    /* istanbul ignore next */
     if (next) next()
     return true
   }
