@@ -13,12 +13,33 @@ function * fromArray (arr) {
   }
 }
 
+function * fromArrayError (arr) {
+  for (let ii = 0; ii < arr.length; ++ii) {
+    if (ii > 0) throw new Error('Boom')
+    yield ii
+  }
+}
+
 test('identity', t => {
   const gen = fun(fromArray([1, 2, 3]))
   t.is(Boolean(isaReadable(gen)), true, 'fun-generator: is readable')
   t.is(Boolean(isaWritable(gen)), false, 'fun-generator: is not writable')
   t.is(Boolean(FunStream.isFun(gen)), true, 'fun-generator: isFun')
   t.done()
+})
+
+test('backpresure', t => {
+  const data = []
+  for (let ii = 0; ii<1000; ++ii) {
+    data.push(ii)
+  }
+  const gen = fun(fromArray(data))
+  return gen.list().then(result => t.isDeeply(result, data), () => t.fail())
+})
+
+test('errors', t => {
+  const gen = fun(fromArrayError([1, 2, 3]))
+  return gen.list().then(() => t.fail(), () => t.pass())
 })
 
 streamTests(test, () => fun(fromArray([1, 2, 3])), {
