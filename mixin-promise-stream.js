@@ -98,9 +98,9 @@ function mixinPromise (Promise, stream) {
   // the fun-stream ways of requesting a promise are passthroughs
   const nop = function () { return this }
   if (is.Writable(obj)) {
-    obj.finished = nop
-  } else {
     obj.ended = nop
+  } else {
+    obj.finished = nop
   }
 
   // the core interface
