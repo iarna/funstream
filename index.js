@@ -23,6 +23,7 @@ Object.defineProperty(fun, 'FunStream', {
 })
 
 try {
+  /* eslint-disable node/no-unpublished-require */
   fun.Promise = require('bluebird')
 } catch (_) {
   fun.Promise = Promise
