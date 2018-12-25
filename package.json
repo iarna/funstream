@@ -4,7 +4,7 @@
   "description": "Funstream gives you iteratorish methods on your streams.",
   "main": "index.js",
   "scripts": {
-    "test": "eslint *.js test/**/*.js && tap -J --100 test/*.js"
+    "test": "iarna-standard *.js test/*.js test/*/*.js && tap -J --100 test/*.js"
   },
   "keywords": [],
   "author": "Rebecca Turner <me@re-becca.org> (http://re-becca.org/)",
@@ -13,17 +13,9 @@
     "isa-stream": "^1.1.1"
   },
   "devDependencies": {
+    "@iarna/standard": "^1.0.1",
     "benchmark": "^2.1.4",
     "bluebird": "^3.5.1",
-    "eslint": "^4.12.1",
-    "eslint-config-standard": "^10.2.1",
-    "eslint-plugin-dependencies": "^2.4.0",
-    "eslint-plugin-import": "^2.8.0",
-    "eslint-plugin-node": "^5.2.1",
-    "eslint-plugin-promise": "^3.6.0",
-    "eslint-plugin-security": "^1.4.0",
-    "eslint-plugin-standard": "^3.0.1",
-    "eslint-plugin-unicorn": "^3.0.0",
     "qw": "^1.0.1",
     "require-inject": "^1.4.3",
     "tap": "^11.0.0",

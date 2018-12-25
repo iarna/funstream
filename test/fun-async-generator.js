@@ -35,7 +35,7 @@ test('identity', t => {
 
 test('backpresure', async t => {
   const data = []
-  for (let ii = 0; ii<1000; ++ii) {
+  for (let ii = 0; ii < 1000; ++ii) {
     data.push(ii)
   }
   const gen = fun(fromArray(data))

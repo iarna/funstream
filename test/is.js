@@ -9,7 +9,7 @@ function * fromArray (arr) {
     yield arr[ii]
   }
 }
-async function* fromAsyncArray (arr) {
+async function * fromAsyncArray (arr) {
   for (let ii = 0; ii < arr.length; ++ii) {
     yield arr[ii]
   }
@@ -24,7 +24,7 @@ test('scalar', t => {
   t.is(is.scalar(Infinity), true, 'Number (Infinity)')
   t.is(is.scalar(NaN), true, 'Number (NaN)')
   t.is(is.scalar(true), true, 'Boolean')
-  t.is(is.scalar(Symbol()), true, 'Symbol')
+  t.is(is.scalar(Symbol('is')), true, 'Symbol')
   t.is(is.scalar([]), false, 'Array')
   t.is(is.scalar({}), false, 'Object')
   t.is(is.scalar(fromArray()), false, 'Iterator')
@@ -44,7 +44,7 @@ test('iterator', t => {
   t.is(is.iterator(Infinity), false, 'Number (Infinity)')
   t.is(is.iterator(NaN), false, 'Number (NaN)')
   t.is(is.iterator(false), false, 'Boolean')
-  t.is(is.iterator(Symbol()), false, 'Symbol')
+  t.is(is.iterator(Symbol('is')), false, 'Symbol')
   t.is(is.iterator([]), false, 'Array')
   t.is(is.iterator({}), false, 'Object')
   t.is(is.iterator(fromArray()), true, 'Iterator')
@@ -63,7 +63,7 @@ test('thenable', t => {
   t.is(is.thenable(Infinity), false, 'Number (Infinity)')
   t.is(is.thenable(NaN), false, 'Number (NaN)')
   t.is(is.thenable(false), false, 'Boolean')
-  t.is(is.thenable(Symbol()), false, 'Symbol')
+  t.is(is.thenable(Symbol('is')), false, 'Symbol')
   t.is(is.thenable([]), false, 'Array')
   t.is(is.thenable({}), false, 'Object')
   t.is(is.thenable(fromArray()), false, 'Iterator')
@@ -82,7 +82,7 @@ test('plainObject', t => {
   t.is(is.plainObject(Infinity), false, 'Number (Infinity)')
   t.is(is.plainObject(NaN), false, 'Number (NaN)')
   t.is(is.plainObject(false), false, 'Boolean')
-  t.is(is.plainObject(Symbol()), false, 'Symbol')
+  t.is(is.plainObject(Symbol('is')), false, 'Symbol')
   t.is(is.plainObject([]), false, 'Array')
   t.is(is.plainObject({}), true, 'Object')
   t.is(is.plainObject(fromArray()), false, 'Iterator')
@@ -101,7 +101,7 @@ test('plainObject', t => {
   t.is(is.asyncIterator(Infinity), false, 'Number (Infinity)')
   t.is(is.asyncIterator(NaN), false, 'Number (NaN)')
   t.is(is.asyncIterator(false), false, 'Boolean')
-  t.is(is.asyncIterator(Symbol()), false, 'Symbol')
+  t.is(is.asyncIterator(Symbol('is')), false, 'Symbol')
   t.is(is.asyncIterator([]), false, 'Array')
   t.is(is.asyncIterator({}), false, 'Object')
   t.is(is.asyncIterator(fromArray()), false, 'Iterator')

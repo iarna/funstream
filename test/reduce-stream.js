@@ -3,7 +3,7 @@ const test = require('tap').test
 const fun = require('..')
 
 test('sync errors', t => {
-  return fun([1,2,3]).reduce((acc, val) => {
+  return fun([1, 2, 3]).reduce((acc, val) => {
     if (val % 2) {
       throw new Error('ODD')
     } else {

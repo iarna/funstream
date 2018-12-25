@@ -30,12 +30,12 @@ streamTests(test, () => fun([1, 2, 3]), {
   list: {expected: [1, 2, 3]},
   grab: {create: () => fun([3, 2, 1]), with: [v => v.sort()], expected: [1, 2, 3], asyncSkip: true},
   sort: {create: () => fun([7, 6, 5]), expected: [5, 6, 7], asyncSkip: true},
-  concat: {expected: ['123'], asyncSkip: true},
+  concat: {expected: ['123'], asyncSkip: true}
 })
 
 // run a second time to catch the "funstream already required" case
 streamTests(test, () => fun([1, 2, 3]), {
-  forEach: {expected: [1, 2, 3]},
+  forEach: {expected: [1, 2, 3]}
 })
 
 promiseTests(test, () => fun([1, 2, 3]), {
@@ -46,7 +46,7 @@ promiseTests(test, () => fun([1, 2, 3]), {
   list: {expected: [1, 2, 3]},
   grab: {create: () => fun([3, 2, 1]), with: [v => v.sort()], expected: [1, 2, 3], asyncSkip: true},
   sort: {create: () => fun([7, 6, 5]), expected: [5, 6, 7], asyncSkip: true},
-  concat: {expected: '123', asyncSkip: true},
+  concat: {expected: '123', asyncSkip: true}
 })
 
 test('backpressure', (t) => {
@@ -60,6 +60,7 @@ test('backpressure', (t) => {
   })
   astr.map((data, cb) => {
     setTimeout(cb, 20, null, '')
+    return data
   }).concat().then(v => {
     t.is(v, '', 'Empty map is empty')
     const maxGap = Math.max.apply(null, gaps)
