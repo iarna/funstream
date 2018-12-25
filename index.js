@@ -10,6 +10,7 @@ let FunGenerator
 let FunAsyncGenerator
 let StreamPromise
 let mixinPromiseStream
+let mixinFun
 
 Object.defineProperty(fun, 'FunStream', {
   enumerable: true,
@@ -52,8 +53,8 @@ function fun (stream, opts) {
   }
   if (typeof stream === 'object') {
     if (is.Readable(stream)) {
-      if (!FunPassThrough) FunPassThrough = require('./fun-passthrough.js')
-      return FunPassThrough.mixin(stream, Object.assign({Promise: fun.Promise}, opts || {}))
+      if (!mixinFun) mixinFun = require('./fun-stream.js').mixin
+      return mixinFun(stream, Object.assign({Promise: fun.Promise}, opts || {}))
     } else if (is.asyncIterator(stream)) {
       if (!FunAsyncGenerator) FunAsyncGenerator = require('./fun-async-generator.js')
       return new FunAsyncGenerator(stream, Object.assign({Promise: fun.Promise}, opts || {}))
