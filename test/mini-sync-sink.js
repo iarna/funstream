@@ -7,6 +7,7 @@ test('basic', t => {
   let expected = ['abc', 'def', 'ghi']
   const font = new PassThrough({objectMode: true})
   const sink = new MiniSyncSink({
+    Promise,
     write (data) {
       t.is(data, expected.shift(), 'got expected data')
     }
@@ -22,6 +23,7 @@ test('error', t => {
   let expected = ['abc', 'def']
   const font = new PassThrough({objectMode: true})
   const sink = new MiniSyncSink({
+    Promise,
     write (data, cb) {
       t.is(data, expected.shift(), 'got expected data')
       if (data === 'def') {

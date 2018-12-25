@@ -19,7 +19,7 @@ class ReduceStreamAsync extends Writable {
   constructor (reduceWith, initial, opts) {
     super({objectMode: true})
     this[FunStream.OPTS] = opts
-    mixinPromiseStream(opts.Promise, this)
+    mixinPromiseStream(this, opts)
     this.reduceWith = reduceWith
     this.acc = initial
     this.once('prefinish', () => this.emit('result', this.acc))

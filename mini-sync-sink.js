@@ -5,7 +5,7 @@ const mixinPromiseStream = require('./mixin-promise-stream.js')
 class MiniSyncSink extends EventEmitter {
   constructor (opts) {
     super(opts)
-    mixinPromiseStream(opts.Promise || Promise, this)
+    mixinPromiseStream(this, opts)
     if (opts.write) this._write = opts.write
   }
   write (data, encoding, next) {

@@ -167,10 +167,8 @@ function isAsync (fun, args, opts) {
 function mixinFun (stream, opts) {
   if (FunStream.isFun(stream)) return stream
 
-  const P = (opts && opts.Promise) || fun.Promise
-
   const cls = typeof stream === 'function' ? stream : null
-  !cls && mixinPromiseStream(P, stream)
+  !cls && mixinPromiseStream(stream, Object.assign({Promise: fun.Promise}, opts || {}))
   const obj = cls ? cls.prototype : stream
 
   if (cls) {

@@ -19,7 +19,7 @@ function ForEachStream (consumeWith, opts) {
 class ForEachStreamAsync extends Writable {
   constructor (opts) {
     super({objectMode: true})
-    mixinPromiseStream(opts.Promise, this)
+    mixinPromiseStream(this, opts)
     this.consumeWith = opts.consumeWith
   }
   _write (data, encoding, next) {

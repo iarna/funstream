@@ -66,8 +66,7 @@ function fun (stream, opts) {
     // note that promise-streamed writables are treated as promises, not as writables
     } else if (is.Writable(stream)) {
       if (!mixinPromiseStream) mixinPromiseStream = require('./mixin-promise-stream.js')
-      const P = (opts && opts.Promise) || fun.Promise
-      return mixinPromiseStream(P, stream)
+      return mixinPromiseStream(stream, Object.assign({Promise: fun.Promise}, opts || {}))
     } else if (opts == null) {
       if (!FunPassThrough) FunPassThrough = require('./fun-passthrough.js')
       return new FunPassThrough(Object.assign({Promise: fun.Promise}, stream))
