@@ -210,7 +210,7 @@ function mixinFun (stream, opts) {
   const originalPipe = obj.pipe
   obj.pipe = function (into, opts) {
     this.on('error', err => {
-      if (err.src === undefined) err.src = this
+      if (err && err.src === undefined) err.src = this
       into.emit('error', err)
     })
     return fun(originalPipe.call(this, into, opts), this[OPTS])
