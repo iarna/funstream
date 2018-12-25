@@ -175,19 +175,19 @@ Constructs a passthrough funstream and passes it as an argument to `todo`.
 stream will end.
 
 ```js
+const sleep = (ms, ...args) => new Promise(_ => setTimeout(_, ms, ...args))
+const result = await fun.with(async st => {
+  for (let count = 0; count < 5; ++count) {
+    st.write(count)
+    await sleep(100)
+  }
+}).list() // [ 0, 1, 2, 3, 4 ]
+```
+```js
+// demonstrating identity here, you wouldn't want to do this:
 let a
 let b = fun.with(async st => { a = st })
 a === b // true
-```
-```js
-const result = await fun.with(st => {
-  let count = 0
-  return new Promise(function each (resolve) {
-    if (++count === 5) return resolve()
-    st.write(count)
-    setTimeout(each, 100, resolve)
-  })
-}).list() // [ 0, 1, 2, 3, 4 ]
 ```
 
 ### fun.FunStream
