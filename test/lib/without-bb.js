@@ -1,5 +1,6 @@
 'use strict'
 const fun = require('../..')
-process.nobb = true
+process.noBB = true
 fun.Promise = Promise
+/* eslint-disable security/detect-non-literal-require */
 require(process.cwd() + '/' + process.argv[2])
