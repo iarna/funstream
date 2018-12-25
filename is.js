@@ -16,6 +16,7 @@ function isScalar (value) {
   switch (typeof value) {
     case 'string':
     case 'number':
+    case 'bigint':
     case 'boolean':
     case 'symbol':
       return true
