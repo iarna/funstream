@@ -1,7 +1,30 @@
 language: node_js
 sudo: false
-node_js:
-  - "9"
-  - "8"
-  - "6"
-  - "4"
+matrix:
+  include:
+    - node_js: "11"
+      install:
+        - "mv node_modules/.cache . || true"
+        - "npm ci"
+        - "mv .cache node_modules/ || true"
+      script:
+        - "npm t"
+    - node_js: "10"
+      script:
+        - "npm run test-no-coverage"
+    - node_js: "8"
+      script:
+        - "npm run test-old-node"
+    - node_js: "6"
+      script:
+        - "npm run test-old-node"
+    - node_js: "4"
+      install:
+        - "mv package-lock.json npm-shrinkwrap.json"
+        - "npm i"
+      script:
+        - "npm run test-old-node"
+cache:
+  directories:
+  - node_modules/.cache
+  - ~/.npm

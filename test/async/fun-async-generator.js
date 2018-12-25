@@ -1,12 +1,13 @@
 'use strict'
+/* eslint-disable node/no-unsupported-features/es-syntax */
 const test = require('tap').test
 const PassThrough = require('stream').PassThrough
-const fun = require('..')
+const fun = require('../..')
 const FunStream = fun.FunStream
 const isaReadable = require('isa-stream').Readable
 const isaWritable = require('isa-stream').Writable
-const streamTests = require('./lib/interface-tests.js').streamTests
-const promiseTests = require('./lib/interface-tests.js').promiseTests
+const streamTests = require('../lib/interface-tests.js').streamTests
+const promiseTests = require('../lib/interface-tests.js').promiseTests
 
 function runQueue () {
   return new Promise(resolve => setImmediate(resolve))

@@ -9,11 +9,6 @@ function * fromArray (arr) {
     yield arr[ii]
   }
 }
-async function * fromAsyncArray (arr) {
-  for (let ii = 0; ii < arr.length; ++ii) {
-    yield arr[ii]
-  }
-}
 
 test('scalar', t => {
   t.is(is.scalar(null), true, 'null')
@@ -28,7 +23,6 @@ test('scalar', t => {
   t.is(is.scalar([]), false, 'Array')
   t.is(is.scalar({}), false, 'Object')
   t.is(is.scalar(fromArray()), false, 'Iterator')
-  t.is(is.scalar(fromAsyncArray()), false, 'AsyncIterator')
   t.is(is.scalar(Promise.resolve()), false, 'Promise')
   t.is(is.scalar(new Readable()), false, 'Readable')
   t.is(is.scalar(new Writable()), false, 'Writable')
@@ -48,7 +42,6 @@ test('iterator', t => {
   t.is(is.iterator([]), false, 'Array')
   t.is(is.iterator({}), false, 'Object')
   t.is(is.iterator(fromArray()), true, 'Iterator')
-  t.is(is.iterator(fromAsyncArray()), false, 'AsyncIterator')
   t.is(is.iterator(Promise.resolve()), false, 'Promise')
   t.is(is.iterator(new Readable()), false, 'Readable')
   t.is(is.iterator(new Writable()), false, 'Writable')
@@ -67,7 +60,6 @@ test('thenable', t => {
   t.is(is.thenable([]), false, 'Array')
   t.is(is.thenable({}), false, 'Object')
   t.is(is.thenable(fromArray()), false, 'Iterator')
-  t.is(is.thenable(fromAsyncArray()), false, 'AsyncIterator')
   t.is(is.thenable(Promise.resolve()), true, 'Promise')
   t.is(is.thenable(new Readable()), false, 'Readable')
   t.is(is.thenable(new Writable()), false, 'Writable')
@@ -86,7 +78,6 @@ test('plainObject', t => {
   t.is(is.plainObject([]), false, 'Array')
   t.is(is.plainObject({}), true, 'Object')
   t.is(is.plainObject(fromArray()), false, 'Iterator')
-  t.is(is.plainObject(fromAsyncArray()), false, 'AsyncIterator')
   t.is(is.plainObject(Promise.resolve()), false, 'Promise')
   t.is(is.plainObject(new Readable()), false, 'Readable')
   t.is(is.plainObject(new Writable()), false, 'Writable')
@@ -105,7 +96,6 @@ test('plainObject', t => {
   t.is(is.asyncIterator([]), false, 'Array')
   t.is(is.asyncIterator({}), false, 'Object')
   t.is(is.asyncIterator(fromArray()), false, 'Iterator')
-  t.is(is.asyncIterator(fromAsyncArray()), true, 'AsyncIterator')
   t.is(is.asyncIterator(Promise.resolve()), false, 'Promise')
   t.is(is.asyncIterator(new Readable()), false, 'Readable')
   t.is(is.asyncIterator(new Writable()), false, 'Writable')
