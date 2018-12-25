@@ -77,7 +77,7 @@ function fun (stream, opts) {
       return new FunPassThrough(Object.assign({Promise: fun.Promise}, stream))
     }
   }
-  throw new Error(`funstream invalid arguments, expected: fun([stream | array], [opts]), got: fun(${[].map.call(arguments, arg => typeof arg).join(', ')})`)
+  throw new Error(`funstream invalid arguments, expected: fun([stream | array | scalar], [opts]), got: fun(${[].map.call(arguments, arg => typeof arg).join(', ')})`)
 }
 fun.with = (todo, opts) => {
   const st = fun(opts)
