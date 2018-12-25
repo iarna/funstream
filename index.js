@@ -51,6 +51,10 @@ function fun (stream, opts) {
     const output = stream(input)
     return new FunDuplex(input, output, opts)
   }
+  // we actually coverall of the types, so until the standard changes, it's
+  // impossible to else-out of this if statement. OTOH, you _can_ fall through if
+  // you run `fun({}, {})`.
+  /* istanbul ignore else */
   if (typeof stream === 'object') {
     if (is.Readable(stream)) {
       if (!mixinFun) mixinFun = require('./fun-stream.js').mixin
