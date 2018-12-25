@@ -4,7 +4,7 @@
   "description": "Funstream gives you iteratorish methods on your streams.",
   "main": "index.js",
   "scripts": {
-    "test": "iarna-standard *.js test/*.js test/*/*.js && tap -J --branches=64 --lines=72 --functions=64 --statements=69  test/*.js test/async/*.js && tap -J --node-arg=test/lib/without-bb.js test/*.js test/async/*.js",
+    "test": "iarna-standard *.js test/*.js test/*/*.js && tap -J --branches=65 --lines=73 --functions=65 --statements=71  test/*.js test/async/*.js && tap -J --node-arg=test/lib/without-bb.js test/*.js test/async/*.js",
     "test-no-coverage": "tap -J test/*.js test/async/*.js",
     "test-old-node": "tap -J test/*.js"
   },
