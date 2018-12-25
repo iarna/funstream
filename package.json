@@ -19,7 +19,7 @@
     "benchmark": "^2.1.4",
     "bluebird": "^3.5.1",
     "qw": "^1.0.1",
-    "require-inject": "^1.4.3",
+    "require-inject": "^1.4.4",
     "tap": "^11.0.0",
     "through2": "^2.0.3"
   },

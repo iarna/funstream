@@ -26,6 +26,8 @@ try {
   /* eslint-disable node/no-unpublished-require */
   fun.Promise = require('bluebird')
 } catch (_) {
+  // we can't repro this till we have npm aliasing
+  /* istanbul ignore next */
   fun.Promise = Promise
 }
 
