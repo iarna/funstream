@@ -1,3 +1,20 @@
+# 3.1.0
+
+* Fix bug where, when mixing in promise-streams (when upgrading a regular
+  stream to a funstream), the provision of ended versus finished methods was
+  swapped.
+* Add support for async generators (thank you Node 10!!)
+* Add `stream.mutate()`, which acts like `stream.map()` but doesn't do anything with the return value of the
+  callback. `stream.mutate(_ => { ... })` is equiv of `stream.map(_ => { ...; return _})`
+* Add `stream.collect()` as an alias for `stream.list()`
+* Add `fun.with(cb)` constructor that passes the callback a stream that's ended when the promise
+  returned by the callback is resolved. This makes manual writing to a stream far more convenient.
+* Add `stream.json()` convenience method, equiv of `stream.concat().then(_ => JSON.parse(_))`
+* Fix error propagation in `stream.reduce()`.
+* Guard iterator/thenable type checking when given symbols. This would
+  caused a crash if you constructed a funstream from a Symbol.  Weird, but
+  shouldn't crash.
+
 # 3.0.0
 
 I'm doing a 3.0.0 to backout the feature added in 2.3.0 where Readable
