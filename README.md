@@ -211,7 +211,7 @@ it ALSO applies when you `.pipe`.
 
 ## PromiseStream methods
 
-### .finished() → Promise
+### .fun.finished() → Promise
 
 Available on Writable promise streams, the returned Promise will resolved
 when the stream emits a `finish` event.  The promise will be rejected if the
@@ -220,7 +220,7 @@ stream emits an `error` event.
 If the stream emits a `result` event then the stream will resolve with that
 value.
 
-### .closed() → Promise
+### .fun.closed() → Promise
 
 Available on Writable promise streams, the returned Promise will resolved
 when the stream emits a `close` event.  The promise will be rejected if the
@@ -265,7 +265,7 @@ fun([1,2,3])
   .sync(str => str.filter(n => n < 3).map(n => n * 2))
 ```
 
-### .ended() → Promise
+### .fun.ended() → Promise
 
 Returns a Promise that resolves when the stream emits an `end` event.  If
 the stream emits an `error` event then it will reject.

@@ -20,8 +20,9 @@ class FunStream {
     this[ISFUN] = true
     this[PROMISES] = {}
     this[RESULT] = null
+    this.fun = { ended: this.fun$ended, finished: this.fun$finished }
   }
-  ended () {
+  fun$ended () {
     if (!is.Readable(this)) throw new TypeError('This stream is not a readable stream, it will not end. Try `.finished()` instead.')
     if (this[PROMISES].ended) return this[PROMISES].ended
     return this[PROMISES].ended = new this[OPTS].Promise((resolve, reject) => {
@@ -29,7 +30,7 @@ class FunStream {
       this.once('end', () => setImmediate(resolve, this[RESULT]))
     })
   }
-  finished () {
+  fun$finished () {
     if (!is.Writable(this)) throw new TypeError('This stream is not a writable stream, it will not finish. Try `.ended()` instead.')
     if (this[PROMISES].finished) return this[PROMISES].finished
     return this[PROMISES].finished = new this[OPTS].Promise((resolve, reject) => {
@@ -37,7 +38,7 @@ class FunStream {
       this.once('finish', () => setImmediate(resolve, this[RESULT]))
     })
   }
-  closed () {
+  fun$closed () {
     if (!is.Writable(this)) throw new TypeError('This stream is not a writable stream, it will not close. Try `.ended()` instead.')
     if (this[PROMISES].closed) return this[PROMISES].closed
     return this[PROMISES].closed = new this[OPTS].Promise((resolve, reject) => {
@@ -190,11 +191,11 @@ function mixinFun (stream, opts) {
   }
 
   if (is.Writable(obj)) {
-    if (!cls || !obj.finished) obj.finished = FunStream.prototype.finished
-    if (!cls || !obj.closed) obj.closed = FunStream.prototype.closed
+    if (!cls || !obj.fun$finished) obj.fun$finished = FunStream.prototype.fun$finished
+    if (!cls || !obj.fun$closed) obj.fun$closed = FunStream.prototype.fun$closed
   }
   if (is.Readable(obj)) {
-    if (!cls || !obj.ended) obj.ended = FunStream.prototype.ended
+    if (!cls || !obj.fun$ended) obj.fun$ended = FunStream.prototype.fun$ended
   }
   if (!cls || !obj.filter) obj.filter = FunStream.prototype.filter
   if (!cls || !obj.map) obj.map = FunStream.prototype.map

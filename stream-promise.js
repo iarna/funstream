@@ -33,7 +33,7 @@ class StreamPromise extends FunStream {
     }).catch(err => this.emit('error', err))
   }
 
-  ended () {
+  fun$ended () {
     return this
   }
 

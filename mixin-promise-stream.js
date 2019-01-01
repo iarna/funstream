@@ -52,7 +52,7 @@ function mixinPromise (stream, opts) {
       let closed = false
       const onEarlyClose = () => setImmediate(() => { closed = true })
       obj.once('close', onEarlyClose)
-      obj.closed = function () {
+      obj.fun$closed = function () {
         if (!is.Writable(this)) throw new TypeError('This stream is not a writable stream, it will not close. Try `.ended()` instead.')
         if (this[CLOSEPROMISE]) return this[CLOSEPROMISE]
         if (error) {
@@ -98,10 +98,11 @@ function mixinPromise (stream, opts) {
 
   // the fun-stream ways of requesting a promise are passthroughs
   const nop = function () { return this }
+
   if (is.Writable(obj)) {
-    obj.ended = nop
+    obj.fun$finished = nop
   } else {
-    obj.finished = nop
+    obj.fun$ended = nop
   }
 
   // the core interface
