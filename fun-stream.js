@@ -13,6 +13,7 @@ const OPTS = Symbol('opts')
 const ISFUN = Symbol('isFun')
 const PROMISES = Symbol('promises')
 const RESULT = Symbol('result')
+const PIPE = Symbol('pipe')
 class FunStream {
   init (opts) {
     this[OPTS] = Object.assign({Promise: Promise}, opts || {})
@@ -142,6 +143,14 @@ class FunStream {
     const opts = Object.assign({}, this[OPTS], forEachOpts || {})
     return this.pipe(ForEachStream(forEachWith, opts))
   }
+  pipe (into, opts) {
+    this.on('error', err => {
+      if (err && err.src === undefined) err.src = this
+      into.emit('error', err)
+    })
+    const funified = fun(this[PIPE](into, opts), this[OPTS], opts && opts.what)
+    return funified
+  }
 }
 
 // collect (opts) is an alias of list
@@ -207,14 +216,11 @@ function mixinFun (stream, opts) {
   if (!cls || !obj.sync) obj.sync = FunStream.prototype.sync
   if (!cls || !obj.async) obj.async = FunStream.prototype.async
 
-  const originalPipe = obj.pipe
-  obj.pipe = function (into, opts) {
-    this.on('error', err => {
-      if (err && err.src === undefined) err.src = this
-      into.emit('error', err)
-    })
-    return fun(originalPipe.call(this, into, opts), this[OPTS])
-  }
+  obj[PIPE] = obj.pipe
+  Object.defineProperty(obj, 'pipe', {
+    value: FunStream.prototype.pipe,
+    writable: true
+  })
   return obj
 }
 module.exports = FunStream
