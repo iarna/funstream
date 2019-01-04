@@ -1,3 +1,9 @@
+# 4.0.0
+
+* Our recently introduced closed/finished/ended methods stomped on some stream implementation's use of them
+  as properties. Change the API to put them in a safer place.
+
+
 # 3.2.0
 
 * Fix crash when a stream object's pipe method was readonly. (For example, with minipass.)
