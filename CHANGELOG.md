@@ -1,3 +1,13 @@
+# 3.2.0
+
+* Fix crash when a stream object's pipe method was readonly. (For example, with minipass.)
+* Improve stream ducktyping to support minipass based streams.
+* Fix error in reduceTo family of functions when promise returning reductions, where we were running
+  all the reductions in parallel rather than waiting for them to complete individually.
+* Guard against crashes when promises are rejected with null/undefined values.
+* Improve error messaging on invalid arguments.
+* Add support for `fun(123n)` working like `fun(123)`
+
 # 3.1.0
 
 * Fix bug where, when mixing in promise-streams (when upgrading a regular
