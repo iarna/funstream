@@ -313,7 +313,7 @@ Transform the stream!
 
 `stream.mutate(data => {…})` is sugar for `stream.map(data => {…; return data})`
 
-### .flat([, opts]) → FunStream
+### .flat([opts]) → FunStream
 
 Flattens arrays in the streams into object emissions! That is to say, a stream of two objects:
 
@@ -329,7 +329,7 @@ Will become a stream of six objects:
 
 This is implemented as `flatMap(v => v, opts)`
 
-### .flatMap([, opts]) → FunStream
+### .flatMap([opts]) → FunStream
 
 Transform all the stream elements and flatten any return values.  This is
 the equivalent of:
@@ -340,7 +340,7 @@ map(…).flat()
 
 Only without multiple phases.
 
-### .sort(sortWith, opts) → FunStream
+### .sort(sortWith[, opts]) → FunStream
 
 WARNING: This has to load all of your content into memory in order to sort
 it, so be sure to do your filtering or limiting (with `.head`) before you
@@ -356,7 +356,7 @@ fun(stream)
   .sort((a, b) => a.localeCompare(b))
 ```
 
-### .grab(grabWith, opts) → FunStream
+### .grab(grabWith[, opts]) → FunStream
 
 WARNING: This has to load all of your content into memory in order to sort
 it, so be sure to do your filtering or limiting (with `.head`) before you
@@ -379,7 +379,7 @@ supported but it does mean loading the entire stream into memory.
 
 It's the equivalent of `fun(grabWith(await stream.list()))`
 
-### .list(opts) → FunStream
+### .list([opts]) → FunStream
 
 Alias: `.collect(opts)`
 
@@ -392,11 +392,11 @@ const data = await fun().map(…).filter(…).list()
 
 It's just sugar for: `reduceToArray((acc, val) => acc.push(val), opts)`
 
-### .concat(opts) → FunStream
+### .concat([opts]) → FunStream
 
 Promise a string produced by concatenating all of the values in the stream.
 
-### .json(opts) → FunStream
+### .json([opts]) → FunStream
 
 Promise an object produced by JSON parsing the result of `.concat()`. Sugar for:
 
@@ -423,7 +423,7 @@ The return value is _also_ a stream, so you can hang the usual event
 listeners off it.  Reduce streams emit a `result` event just before
 `finish` with the final value of the accumulator in the reduce.
 
-### .reduceToArray(reduceWith, opts) → FunStream
+### .reduceToArray(reduceWith[, opts]) → FunStream
 
 Promise the result of reducing into an array.  Handy when you want to push
 on to an array without worrying about your return value. This is sugar for:
@@ -433,7 +433,7 @@ fun(stream)
   .reduce((acc, value) => { reduceWith(acc, value) ; return acc }, [])
 ```
 
-### .reduceToArray(reduceWith, opts) → FunStream
+### .reduceToArray(reduceWith[, opts]) → FunStream
 
 Promise the result of reducing into an array. Handy when you want to build
 an object without worrying about your return values. This is sugar for:
