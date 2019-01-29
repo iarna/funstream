@@ -344,6 +344,11 @@ Only without multiple phases.
 
 Parse the input stream into lines, emitting one line per chunk. Newlines are removed.
 
+### .ndjson([opts]) → FunStream
+
+Parse the input stream as new-line delimited JSON, emitting one parsed JSON
+object per line.  Empty lines are ignored.
+
 ### .sort(sortWith[, opts]) → FunStream
 
 WARNING: This has to load all of your content into memory in order to sort
