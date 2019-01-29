@@ -1,8 +1,12 @@
+# 4.1.0
+
+* Add support for `stream.lines()` to split the stream on lines and emit one line at a time.
+* Add support for `stream.ndjson()` to parse the stream as newline delimited JSON and emit one object at a time.
+
 # 4.0.0
 
 * Our recently introduced closed/finished/ended methods stomped on some stream implementation's use of them
   as properties. Change the API to put them in a safer place.
-
 
 # 3.2.0
 
