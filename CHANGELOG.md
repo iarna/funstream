@@ -1,3 +1,8 @@
+# 4.1.1
+
+* Fix `stream.lines()` (and in turn `stream.ndjson()`) to support CRLF terminated lines.
+* Fix a bug where if multiple chunks were emitted without newlines end them and then the stream closed, they would be emitted with newlines injected between them (but as a single "line").
+
 # 4.1.0
 
 * Add support for `stream.lines()` to split the stream on lines and emit one line at a time.
