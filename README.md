@@ -340,6 +340,10 @@ map(…).flat()
 
 Only without multiple phases.
 
+### .lines([opts]) → FunStream
+
+Parse the input stream into lines, emitting one line per chunk. Newlines are removed.
+
 ### .sort(sortWith[, opts]) → FunStream
 
 WARNING: This has to load all of your content into memory in order to sort

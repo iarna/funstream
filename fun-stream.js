@@ -8,6 +8,7 @@ let MutateStream
 let FlatMapStream
 let ReduceStream
 let ForEachStream
+let LineStream
 
 const OPTS = Symbol('opts')
 const ISFUN = Symbol('isFun')
@@ -92,6 +93,11 @@ class FunStream {
     if (!FlatMapStream) FlatMapStream = require('./flat-map-stream.js')
     const map = FlatMapStream(mapWith, opts ? Object.assign(this[OPTS], opts) : this[OPTS])
     return this.pipe(map)
+  }
+  lines (opts) {
+    if (!LineStream) LineStream = require('./line-stream.js')
+    const lines = new LineStream(opts)
+    return this.pipe(lines)
   }
   head (maxoutput) {
     let seen = 0
@@ -210,6 +216,7 @@ function mixinFun (stream, opts) {
   if (!cls || !obj.concat) obj.concat = FunStream.prototype.concat
   if (!cls || !obj.json) obj.json = FunStream.prototype.json
   if (!cls || !obj.list) obj.list = FunStream.prototype.list
+  if (!cls || !obj.lines) obj.lines = FunStream.prototype.lines
   if (!cls || !obj.collect) obj.collect = FunStream.prototype.collect
   if (!cls || !obj.grab) obj.grab = FunStream.prototype.grab
   if (!cls || !obj.sort) obj.sort = FunStream.prototype.sort

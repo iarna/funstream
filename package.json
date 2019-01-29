@@ -41,7 +41,8 @@
     "mixin-promise-stream.js",
     "mutate-stream.js",
     "reduce-stream.js",
-    "stream-promise.js"
+    "stream-promise.js",
+    "line-stream.js"
   ],
   "directories": {
     "test": "test"
