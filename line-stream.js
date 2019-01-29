@@ -15,13 +15,15 @@ class LineStream extends FunTransform {
       return next()
     }
     while (newlineLoc !== -1) {
-      let chunk = data.slice(lastIndex, newlineLoc)
+      let chunk
       if (this.buffer.length > 0) {
-        this.push(this.buffer.join('') + chunk)
+        chunk = this.buffer.join('') + data.slice(lastIndex, newlineLoc)
         this.buffer = []
       } else {
-        this.push(chunk)
+        chunk = data.slice(lastIndex, newlineLoc)
       }
+      if (chunk[chunk.length - 1] === '\r') chunk = chunk.slice(0, -1)
+      this.push(chunk)
       lastIndex = newlineLoc + 1
       newlineLoc = data.indexOf('\n', lastIndex)
     }
