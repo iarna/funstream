@@ -29,7 +29,7 @@ class LineStream extends FunTransform {
     next()
   }
   _flush (next) {
-    if (this.buffer.length > 0) this.push(this.buffer.join('\n'))
+    if (this.buffer.length > 0) this.push(this.buffer.join(''))
     this.buffer = null
     next()
   }

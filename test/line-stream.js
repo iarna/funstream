@@ -15,3 +15,14 @@ test('line-stream', t => {
     t.isDeeply(values, [ 'abcdef', 'ghi', 'jklmno', 'pqr', '' ])
   })
 })
+
+test('no-new-lines', t => {
+  const st = fun()
+  st.write('abc')
+  st.write('def')
+  st.write('ghi')
+  st.end()
+  return st.lines().collect().then(values => {
+    t.isDeeply(values, [ 'abcdefghi' ])
+  })
+})
