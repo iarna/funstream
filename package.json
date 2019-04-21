@@ -17,7 +17,7 @@
   "devDependencies": {
     "@iarna/standard": "^2.0.1",
     "benchmark": "^2.1.4",
-    "bluebird": "^3.5.1",
+    "bluebird": "^3.5.4",
     "qw": "^1.0.1",
     "require-inject": "^1.4.4",
     "tap": "^11.0.0",
