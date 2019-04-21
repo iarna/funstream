@@ -1,3 +1,8 @@
+# 4.2.0
+
+* Add `stream.fromJson()` which is the same as `stream.json()`
+* Add `stream.fromNdjson()` which is the same as `stream.ndjson()`
+
 # 4.1.1
 
 * Fix `stream.lines()` (and in turn `stream.ndjson()`) to support CRLF terminated lines.

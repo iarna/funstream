@@ -99,9 +99,6 @@ class FunStream {
     const lines = new LineStream(opts)
     return this.pipe(lines)
   }
-  ndjson (opts) {
-    return this.lines(opts).flatMap(_ => _ === '' ? [] : JSON.parse(_), opts)
-  }
   head (maxoutput) {
     let seen = 0
     return this.sync(o => o.filter(() => seen++ < maxoutput))
@@ -145,7 +142,16 @@ class FunStream {
   concat (opts) {
     return this.sync(o => o.reduce((acc, val) => acc + String(val), '', opts))
   }
+  ndjson (opts) {
+    return this.fromNdjson(opts)
+  }
   json (opts) {
+    return this.fromJson(opts)
+  }
+  fromNdjson (opts) {
+    return this.lines(opts).flatMap(_ => _ === '' ? [] : JSON.parse(_), opts)
+  }
+  fromJson (opts) {
     return this.concat().then(str => JSON.parse(str))
   }
   forEach (forEachWith, forEachOpts) {
@@ -217,10 +223,12 @@ function mixinFun (stream, opts) {
   if (!cls || !obj.reduceToArray) obj.reduceToArray = FunStream.prototype.reduceToArray
   if (!cls || !obj.reduceToObject) obj.reduceToObject = FunStream.prototype.reduceToObject
   if (!cls || !obj.concat) obj.concat = FunStream.prototype.concat
-  if (!cls || !obj.json) obj.json = FunStream.prototype.json
   if (!cls || !obj.list) obj.list = FunStream.prototype.list
   if (!cls || !obj.lines) obj.lines = FunStream.prototype.lines
+  if (!cls || !obj.json) obj.json = FunStream.prototype.json
   if (!cls || !obj.ndjson) obj.ndjson = FunStream.prototype.ndjson
+  if (!cls || !obj.fromJson) obj.fromJson = FunStream.prototype.fromJson
+  if (!cls || !obj.fromNdjson) obj.fromNdjson = FunStream.prototype.fromNdjson
   if (!cls || !obj.collect) obj.collect = FunStream.prototype.collect
   if (!cls || !obj.grab) obj.grab = FunStream.prototype.grab
   if (!cls || !obj.sort) obj.sort = FunStream.prototype.sort

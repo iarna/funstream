@@ -345,8 +345,9 @@ Only without multiple phases.
 Parse the input stream into lines, emitting one line per chunk. Newlines are removed.
 
 ### .ndjson([opts]) → FunStream
+### .fromNdjson([opts]) → FunStream
 
-Parse the input stream as new-line delimited JSON, emitting one parsed JSON
+Parse the input stream as newline delimited JSON, emitting one parsed JSON
 object per line.  Empty lines are ignored.
 
 ### .sort(sortWith[, opts]) → FunStream
@@ -405,7 +406,8 @@ It's just sugar for: `reduceToArray((acc, val) => acc.push(val), opts)`
 
 Promise a string produced by concatenating all of the values in the stream.
 
-### .json([opts]) → FunStream
+### .json([opts]) → PromiseStream
+### .fromJson([opts]) → PromiseStream
 
 Promise an object produced by JSON parsing the result of `.concat()`. Sugar for:
 
