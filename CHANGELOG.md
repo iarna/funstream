@@ -1,5 +1,7 @@
 # 4.2.0
 
+* Add `stream.toJson()` which takes a series of objects and emits them as a JSON stringified array.
+* Add `stream.toNdjson()` which takes a series of objects and emits them as new-line delimited JSON.
 * Add `stream.fromJson()` which is the same as `stream.json()`
 * Add `stream.fromNdjson()` which is the same as `stream.ndjson()`
 

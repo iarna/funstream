@@ -30,3 +30,13 @@ test('from-json-stream', t => {
     t.isDeeply(values, [ {abc: true}, {ghi: true}, {jkl: true}, {pqr: true} ])
   })
 })
+
+test('to-json-stream', t => {
+  const st = fun()
+  st.write({abc: true})
+  st.write({ghi: true})
+  st.end()
+  return st.toJson().concat().then(result => {
+    t.isDeeply(result, '[{"abc":true},{"ghi":true}]')
+  })
+})

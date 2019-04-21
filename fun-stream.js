@@ -154,6 +154,12 @@ class FunStream {
   fromJson (opts) {
     return this.concat().then(str => JSON.parse(str))
   }
+  toJson (opts) {
+    return this.grab(_ => JSON.stringify(_), opts)
+  }
+  toNdjson (opts) {
+    return this.map(_ => JSON.stringify(_) + '\n', opts)
+  }
   forEach (forEachWith, forEachOpts) {
     if (!ForEachStream) ForEachStream = require('./for-each-stream.js')
     const opts = Object.assign({}, this[OPTS], forEachOpts || {})
@@ -227,6 +233,8 @@ function mixinFun (stream, opts) {
   if (!cls || !obj.lines) obj.lines = FunStream.prototype.lines
   if (!cls || !obj.json) obj.json = FunStream.prototype.json
   if (!cls || !obj.ndjson) obj.ndjson = FunStream.prototype.ndjson
+  if (!cls || !obj.toJson) obj.toJson = FunStream.prototype.toJson
+  if (!cls || !obj.toNdjson) obj.toNdjson = FunStream.prototype.toNdjson
   if (!cls || !obj.fromJson) obj.fromJson = FunStream.prototype.fromJson
   if (!cls || !obj.fromNdjson) obj.fromNdjson = FunStream.prototype.fromNdjson
   if (!cls || !obj.collect) obj.collect = FunStream.prototype.collect

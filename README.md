@@ -350,6 +350,14 @@ Parse the input stream into lines, emitting one line per chunk. Newlines are rem
 Parse the input stream as newline delimited JSON, emitting one parsed JSON
 object per line.  Empty lines are ignored.
 
+### .toNdjson([opts]) → FunStream
+
+Take an input object stream and emit as newline delimited JSON. Sugar for:
+
+```js
+stream.map(_ => JSON.stringify(_) + '\n', opts)
+```
+
 ### .sort(sortWith[, opts]) → FunStream
 
 WARNING: This has to load all of your content into memory in order to sort
@@ -413,6 +421,14 @@ Promise an object produced by JSON parsing the result of `.concat()`. Sugar for:
 
 ```js
 stream.concat().then(str => JSON.parse(str))
+```
+
+### .toJson([opts]) -> PromiseStream
+
+Given a stream of objects, produces a JSON stringified array of them. Sugar for:
+
+```js
+stream.grab(_ => JSON.stringify(_), opts)
 ```
 
 ### .reduce(reduceWith[, initial[, opts]]) → FunStream

@@ -30,3 +30,13 @@ test('from-ndjson-stream', t => {
     t.isDeeply(values, [ {abc: true}, {ghi: true}, {jkl: true}, {pqr: true} ])
   })
 })
+
+test('to-ndjson-stream', t => {
+  const st = fun()
+  st.write({abc: true})
+  st.write({ghi: true})
+  st.end()
+  return st.toNdjson().concat().then(result => {
+    t.isDeeply(result, '{"abc":true}\n{"ghi":true}\n')
+  })
+})
