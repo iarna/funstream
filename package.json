@@ -15,7 +15,7 @@
     "isa-stream": "^1.1.3"
   },
   "devDependencies": {
-    "@iarna/standard": "^2.0.0",
+    "@iarna/standard": "^2.0.1",
     "benchmark": "^2.1.4",
     "bluebird": "^3.5.1",
     "qw": "^1.0.1",
