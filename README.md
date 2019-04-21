@@ -327,7 +327,7 @@ Will become a stream of six objects:
 1, 2, 3, 23, 42, 57
 ```
 
-This is implemented as `flatMap(v => v, opts)`
+This is implemented as `stream.flatMap(v => v, opts)`
 
 ### .flatMap([opts]) → FunStream
 
@@ -335,7 +335,7 @@ Transform all the stream elements and flatten any return values.  This is
 the equivalent of:
 
 ```js
-map(…).flat()
+stream.map(…).flat()
 ```
 
 Only without multiple phases.
