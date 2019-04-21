@@ -21,7 +21,7 @@ class FunStream {
     this[ISFUN] = true
     this[PROMISES] = {}
     this[RESULT] = null
-    this.fun = { ended: this.fun$ended, finished: this.fun$finished }
+    this.fun = { ended: () => this.fun$ended(), finished: () => this.fun$finished() }
   }
   fun$ended () {
     if (!is.Readable(this)) throw new TypeError('This stream is not a readable stream, it will not end. Try `.finished()` instead.')

@@ -4,6 +4,7 @@
 * Add `stream.toNdjson()` which takes a series of objects and emits them as new-line delimited JSON.
 * Add `stream.fromJson()` which is the same as `stream.json()`
 * Add `stream.fromNdjson()` which is the same as `stream.ndjson()`
+* Fixed `fun.finished` and `fun.ended`, which previously would refuse to run.
 
 # 4.1.1
 
