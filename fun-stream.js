@@ -21,7 +21,7 @@ class FunStream {
     this[ISFUN] = true
     this[PROMISES] = {}
     this[RESULT] = null
-    this.fun = { ended: () => this.fun$ended(), finished: () => this.fun$finished() }
+    this.fun = { ended: () => this.fun$ended(), finished: () => this.fun$finished(), writable: () => this.fun$writable() }
   }
   fun$ended () {
     if (!is.Readable(this)) throw new TypeError('This stream is not a readable stream, it will not end. Try `.finished()` instead.')
@@ -45,6 +45,13 @@ class FunStream {
     return this[PROMISES].closed = new this[OPTS].Promise((resolve, reject) => {
       this.once('error', reject)
       this.once('close', resolve)
+    })
+  }
+  fun$writable () {
+    if (!is.Writable(this)) throw new TypeError("This stream is not a writable stream, so it can't be... writable.")
+    if (this.writable) return Promise.resolve()
+    return new Promise(resolve => {
+      this.once('drain', resolve)
     })
   }
   async (todo) {
@@ -212,6 +219,7 @@ function mixinFun (stream, opts) {
   }
 
   if (is.Writable(obj)) {
+    if (!cls || !obj.fun$writable) obj.fun$writable = FunStream.prototype.fun$writable
     if (!cls || !obj.fun$finished) obj.fun$finished = FunStream.prototype.fun$finished
     if (!cls || !obj.fun$closed) obj.fun$closed = FunStream.prototype.fun$closed
   }
@@ -243,6 +251,7 @@ function mixinFun (stream, opts) {
   if (!cls || !obj.forEach) obj.forEach = FunStream.prototype.forEach
   if (!cls || !obj.sync) obj.sync = FunStream.prototype.sync
   if (!cls || !obj.async) obj.async = FunStream.prototype.async
+  if (!cls || !obj.whenWritable) obj.whenWritable = FunStream.prototype.whenWritable
 
   obj[PIPE] = obj.pipe
   Object.defineProperty(obj, 'pipe', {

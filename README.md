@@ -229,25 +229,6 @@ stream emits an `error` event.
 NOTE: Not all streams emit a `close` event and if you use this on a stream
 that does not then it will never resolve.
 
-## FunStream methods
-
-This is the good stuff.  All callbacks can be sync or async.  You can
-indicate this by setting the `async` property on the opts object either when
-calling the method below or when constructing the objects to start with.
-Values of the `async` property propagate down the chain, for example:
-
-`.map(…, {async: true}).map(…)`
-
-The second map callback will also be assume do to be async.
-
-Multiple sync functions of the same time will be automatically aggregated
-without constructing additional streams, so:
-
-`.filter(n => n < 23).filter(n => n > 5)`
-
-The second `filter` call actually returns the same stream object.  This does
-mean that if you try to fork the streams in between it won't work. Sorry.
-
 ### .async() → this
 ### .sync() → this
 
@@ -269,6 +250,55 @@ fun([1,2,3])
 
 Returns a Promise that resolves when the stream emits an `end` event.  If
 the stream emits an `error` event then it will reject.
+
+### .fun.writable() → Promise(Boolean)
+
+_With Node >= 11.4.0:_
+
+Returns a promise that resolves when the stream is writable to ensure you
+don't bloat out the buffers of a stream that is slow to consume data:
+
+```
+await stream.fun.writable()
+stream.write('my chunk of data')
+```
+
+Under the hood what this does is check the `writable` flag introduced in
+11.4, if that's true then it just resolves, if false it attaches itself to
+the drain event and resolves when that happens.
+
+_With Node < 11.4.0:_
+
+Prior to 11.4, you have to track writable status yourself, but you can still
+use `fun.writable()` to be notified when the stream is ready for more data.
+
+DANGER: Be sure that the stream is NOT writable before calling
+`fun.writable` or the promise may never resolve (because the underlying
+stream won't emit a `drain` event.)
+
+```
+const writable = stream.write('my chunk of data')
+if (!writable) await stream.fun.writable()
+```
+
+## FunStream methods
+
+This is the good stuff.  All callbacks can be sync or async.  You can
+indicate this by setting the `async` property on the opts object either when
+calling the method below or when constructing the objects to start with.
+Values of the `async` property propagate down the chain, for example:
+
+`.map(…, {async: true}).map(…)`
+
+The second map callback will also be assume do to be async.
+
+Multiple sync functions of the same time will be automatically aggregated
+without constructing additional streams, so:
+
+`.filter(n => n < 23).filter(n => n > 5)`
+
+The second `filter` call actually returns the same stream object.  This does
+mean that if you try to fork the streams in between it won't work. Sorry.
 
 ### .pipe(target[, opts]) → FunStream(target)
 
