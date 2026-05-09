@@ -234,16 +234,32 @@ that does not then it will never resolve.
 
 Sets the stream `async` stream option to true and false respectively.
 
+When you set `.async()` on a stream, all subsequent operations will be
+assumed to use async callbacks (promises or callbacks). This is useful
+when you want to skip auto-detection:
+
+```js
+fun([1, 2, 3])
+  .async()
+  .map(v => Promise.resolve(v * 2)) // detected as async
+```
+
 ### .async(todo) → FunStream
 ### .sync(todo) → FunStream
 
 Runs `todo` with a stream with the appropriate `async` option set.  The
-returned value is restored to the previous setting.
+returned value of `todo` becomes the new stream, with the async mode restored
+to the prior setting.
 
-```
+`async(fn)` temporarily switches a stream into async mode to run `fn`,
+then restores the original mode. This is useful when you want a chain of
+operations to run in async mode without affecting downstream operations:
+
+```js
 fun([1,2,3])
-  .filter(async n => n > 0)
-  .sync(str => str.filter(n => n < 3).map(n => n * 2))
+  .filter(n => n % 2 === 0)                  // sync (auto-detected)
+  .async(st => st.map(v => Promise.resolve(v * 2)))  // async temporarily
+  .filter(n => n > 2)                        // back to sync
 ```
 
 ### .fun.ended() → Promise
