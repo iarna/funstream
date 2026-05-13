@@ -6,13 +6,14 @@ const isaReadable = require('isa-stream').Readable
 const isaWritable = require('isa-stream').Writable
 const streamTests = require('./lib/interface-tests.js').streamTests
 const promiseTests = require('./lib/interface-tests.js').promiseTests
-const Bluebird = require('bluebird')
 
 function fromArray (arr) {
   const stream = fun()
-  Bluebird.each(arr, v => {
-    stream.write(v)
-  }).then(() => {
+  arr.reduce(function (prev, v) {
+    return prev.then(function () {
+      stream.write(v)
+    })
+  }, Promise.resolve()).then(function () {
     stream.end()
   })
   return fun(Promise.resolve(stream))

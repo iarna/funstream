@@ -17,8 +17,7 @@ class StreamPromise extends FunStream {
   constructor (promise, opts) {
     super()
     this[PROMISE] = promise
-    const P = Object.getPrototypeOf(promise) === Promise.prototype ? Promise : opts.Promise
-    mixinPromiseStream(this, {Promise: P})
+    mixinPromiseStream(this, {})
     this.init(this, opts)
     this[PIPES] = new Map()
     this[UNPIPE] = []

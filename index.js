@@ -23,19 +23,10 @@ Object.defineProperty(fun, 'FunStream', {
   }
 })
 
-try {
-  /* eslint-disable node/no-unpublished-require */
-  fun.Promise = require('bluebird')
-} catch (_) {
-  // we can't repro this till we have npm aliasing
-  /* istanbul ignore next */
-  fun.Promise = Promise
-}
-
 function fun (stream, opts) {
   if (stream == null) {
     if (!FunPassThrough) FunPassThrough = require('./fun-passthrough.js')
-    return new FunPassThrough(Object.assign({Promise: fun.Promise}, opts || {}))
+    return new FunPassThrough(Object.assign({}, opts || {}))
   }
 
   if (is.scalar(stream)) {
@@ -43,7 +34,7 @@ function fun (stream, opts) {
   }
   if (Array.isArray(stream)) {
     if (!FunArray) FunArray = require('./fun-array.js')
-    return new FunArray(stream, Object.assign({Promise: fun.Promise}, opts || {}))
+    return new FunArray(stream, Object.assign({}, opts || {}))
   }
   if (typeof stream === 'function') {
     if (!FunDuplex) FunDuplex = require('./fun-duplex.js')
@@ -58,23 +49,23 @@ function fun (stream, opts) {
   if (typeof stream === 'object') {
     if (is.Readable(stream)) {
       if (!mixinFun) mixinFun = require('./fun-stream.js').mixin
-      return mixinFun(stream, Object.assign({Promise: fun.Promise}, opts || {}))
+      return mixinFun(stream, Object.assign({}, opts || {}))
     } else if (is.asyncIterator(stream)) {
       if (!FunAsyncGenerator) FunAsyncGenerator = require('./fun-async-generator.js')
-      return new FunAsyncGenerator(stream, Object.assign({Promise: fun.Promise}, opts || {}))
+      return new FunAsyncGenerator(stream, Object.assign({}, opts || {}))
     } if (is.iterator(stream)) {
       if (!FunGenerator) FunGenerator = require('./fun-generator.js')
-      return new FunGenerator(stream, Object.assign({Promise: fun.Promise}, opts || {}))
+      return new FunGenerator(stream, Object.assign({}, opts || {}))
     } else if (is.thenable(stream)) { // promises of fun
       if (!StreamPromise) StreamPromise = require('./stream-promise.js')
-      return new StreamPromise(stream, Object.assign({Promise: fun.Promise}, opts || {}))
+      return new StreamPromise(stream, Object.assign({}, opts || {}))
     // note that promise-streamed writables are treated as promises, not as writables
     } else if (is.Writable(stream)) {
       if (!mixinPromiseStream) mixinPromiseStream = require('./mixin-promise-stream.js')
-      return mixinPromiseStream(stream, Object.assign({Promise: fun.Promise}, opts || {}))
+      return mixinPromiseStream(stream, Object.assign({}, opts || {}))
     } else if (opts == null) {
       if (!FunPassThrough) FunPassThrough = require('./fun-passthrough.js')
-      return new FunPassThrough(Object.assign({Promise: fun.Promise}, stream))
+      return new FunPassThrough(Object.assign({}, stream))
     }
   }
   throw new Error(`funstream invalid arguments, expected: fun([stream | array | scalar], [opts]), got: fun(${[].map.call(arguments, arg => typeof arg).join(', ')})`)

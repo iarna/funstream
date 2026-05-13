@@ -297,7 +297,6 @@ test('FunStream.isFun', function (t) {
 test('FunStream.OPTS symbol', function (t) {
   const st = fun([1, 2, 3])
   t.ok(st[FunStream.OPTS], 'OPTS symbol accessible')
-  t.ok(st[FunStream.OPTS].Promise, 'OPTS has Promise')
   t.done()
 })
 

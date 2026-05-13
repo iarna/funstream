@@ -9,7 +9,6 @@ const MAKEPROMISE = Symbol('makePromise')
 mixinPromise.PROMISE = PROMISE
 
 function mixinPromise (stream, opts) {
-  const Promise = opts.Promise
   const cls = typeof stream === 'function' ? stream : null
   const obj = cls ? cls.prototype : stream
 

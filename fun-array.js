@@ -27,7 +27,7 @@ class FunArray extends Readable {
       return FunStream.prototype.forEach.call(this, forEachWith, forEachOpts)
     } else {
       if (!fun) fun = require('./index.js')
-      return fun(new opts.Promise(resolve => {
+      return fun(new Promise(resolve => {
         process.nextTick(() => {
           this[DATA].forEach(v => forEachWith(v))
           resolve()

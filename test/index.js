@@ -7,16 +7,7 @@ const is = require('../is.js')
 
 function freshfun () {
   const fun = requireInject('../index.js')
-  if (process.noBB) fun.Promise = Promise
   return fun
-}
-
-if (process.noBB) {
-  // this just ensures that test/lib/without-bb.js is doing its job
-  test('no-blue', t => {
-    t.is(fun.Promise, Promise, 'used regular promise')
-    t.done()
-  })
 }
 
 test('fun.FunStream', t => {

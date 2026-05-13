@@ -190,13 +190,6 @@ let b = fun.with(async st => { a = st })
 a === b // true
 ```
 
-### fun.FunStream
-
-Exactly the same as `stream.PassThrough` but with fun added.  `fun()` is
-mostly the same as `new fun.FunStream()`.  (The former will use Bluebird for
-promises if available but fallback to system promises.  The latter has no
-magic and just uses system promises.)
-
 ### require('funstream/fun-stream').mixin
 
 The core extension mechanism (otherwise unneeded).  It adds fun to an

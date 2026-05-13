@@ -17,7 +17,7 @@ const RESULT = Symbol('result')
 const PIPE = Symbol('pipe')
 class FunStream {
   init (opts) {
-    this[OPTS] = Object.assign({Promise: Promise}, opts || {})
+    this[OPTS] = Object.assign({}, opts || {})
     this[ISFUN] = true
     this[PROMISES] = {}
     this[RESULT] = null
@@ -26,7 +26,7 @@ class FunStream {
   fun$ended () {
     if (!is.Readable(this)) throw new TypeError('This stream is not a readable stream, it will not end. Try `.finished()` instead.')
     if (this[PROMISES].ended) return this[PROMISES].ended
-    return this[PROMISES].ended = new this[OPTS].Promise((resolve, reject) => {
+    return this[PROMISES].ended = new Promise((resolve, reject) => {
       this.once('error', reject)
       this.once('end', () => setImmediate(resolve, this[RESULT]))
     })
@@ -34,7 +34,7 @@ class FunStream {
   fun$finished () {
     if (!is.Writable(this)) throw new TypeError('This stream is not a writable stream, it will not finish. Try `.ended()` instead.')
     if (this[PROMISES].finished) return this[PROMISES].finished
-    return this[PROMISES].finished = new this[OPTS].Promise((resolve, reject) => {
+    return this[PROMISES].finished = new Promise((resolve, reject) => {
       this.once('error', reject)
       this.once('finish', () => setImmediate(resolve, this[RESULT]))
     })
@@ -42,7 +42,7 @@ class FunStream {
   fun$closed () {
     if (!is.Writable(this)) throw new TypeError('This stream is not a writable stream, it will not close. Try `.ended()` instead.')
     if (this[PROMISES].closed) return this[PROMISES].closed
-    return this[PROMISES].closed = new this[OPTS].Promise((resolve, reject) => {
+    return this[PROMISES].closed = new Promise((resolve, reject) => {
       this.once('error', reject)
       this.once('close', resolve)
     })
@@ -120,7 +120,7 @@ class FunStream {
     let reduceToWith
     if (isAsync(reduceWith, 2, opts)) {
       reduceToWith = (acc, value, cb) => {
-        return new opts.Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
           const result = reduceWith(acc, value, err => err ? reject(err) : resolve(acc))
           if (result && result.then) result.then(() => resolve(acc), reject)
         })
@@ -209,6 +209,9 @@ function mixinOne (cls, obj, prop) {
     }
 }
 function forceMixinOne (cls, obj, prop) {
+    if (cls && Object.prototype.hasOwnProperty.call(obj, prop)) {
+      return
+    }
     if (obj[prop] !== FunStream.prototype[prop]) {
       // console.error('Force mixing in', prop)
       obj[prop] = FunStream.prototype[prop]
@@ -219,7 +222,7 @@ function mixinFun (stream, opts) {
   if (FunStream.isFun(stream)) return stream
 
   const cls = typeof stream === 'function' ? stream : null
-  !cls && mixinPromiseStream(stream, Object.assign({Promise: fun.Promise}, opts || {}))
+  !cls && mixinPromiseStream(stream, Object.assign({}, opts || {}))
   const obj = cls ? cls.prototype : stream
 
   if (cls) {
