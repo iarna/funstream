@@ -29,9 +29,11 @@ const suite = new Benchmark.Suite({
 fs.readdir(__dirname, (err, files) => {
   if (err) { throw err }
   files.forEach(f => {
-    if (f[0] !== '.' && path.extname(f) === '.js' && f !== 'index.js') {
+    if (f[0] !== '.' && path.extname(f) === '.m') {
+      console.error('Loading', f)
       require('./' + f)(suite)
     }
   })
+  console.error('Running...')
   suite.run({async: true})
 })
