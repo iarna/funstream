@@ -1,3 +1,16 @@
+# 5.0.0
+
+* BREAKING: Removed support for injecting a third party promise library (like
+  Bluebird).  It just did not seem worth the effort to maintain the
+  complexity at this point.
+
+* Minor documentation updates
+* Substantially improved test coverage
+* Some minor code cleanup
+* Some minor tweaks to bench marking code that had been laying around for 10 years
+* Dev: switched to pnpm and disabled the linter, which needs updating for modern node.
+* Fixes to make it work with the modern stream library from recent nodes
+
 # 4.2.0
 
 * Add `stream.fun.writable()` to get a promisey way of asserting a stream is ready for data
