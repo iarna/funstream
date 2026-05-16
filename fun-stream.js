@@ -202,6 +202,19 @@ function isAsync (fun, args, opts) {
   return fun.length > args
 }
 
+function mixinOne (cls, obj, prop) {
+    if (!cls || !(prop in obj)) {
+      // console.error('Mixing in', prop)
+      obj[prop] = FunStream.prototype[prop]
+    }
+}
+function forceMixinOne (cls, obj, prop) {
+    if (obj[prop] !== FunStream.prototype[prop]) {
+      // console.error('Force mixing in', prop)
+      obj[prop] = FunStream.prototype[prop]
+    }
+}
+
 function mixinFun (stream, opts) {
   if (FunStream.isFun(stream)) return stream
 
@@ -219,39 +232,39 @@ function mixinFun (stream, opts) {
   }
 
   if (is.Writable(obj)) {
-    if (!cls || !obj.fun$writable) obj.fun$writable = FunStream.prototype.fun$writable
-    if (!cls || !obj.fun$finished) obj.fun$finished = FunStream.prototype.fun$finished
-    if (!cls || !obj.fun$closed) obj.fun$closed = FunStream.prototype.fun$closed
+    mixinOne(cls, obj, 'fun$writable')
+    mixinOne(cls, obj, 'fun$finished')
+    mixinOne(cls, obj, 'fun$closed')
   }
   if (is.Readable(obj)) {
-    if (!cls || !obj.fun$ended) obj.fun$ended = FunStream.prototype.fun$ended
+    mixinOne(cls, obj, 'fun$ended')
   }
-  if (!cls || !obj.filter) obj.filter = FunStream.prototype.filter
-  if (!cls || !obj.map) obj.map = FunStream.prototype.map
-  if (!cls || !obj.mutate) obj.mutate = FunStream.prototype.mutate
-  if (!cls || !obj.flat) obj.flat = FunStream.prototype.flat
-  if (!cls || !obj.flatMap) obj.flatMap = FunStream.prototype.flatMap
-  if (!cls || !obj.head) obj.head = FunStream.prototype.head
-  if (!cls || !obj.reduce) obj.reduce = FunStream.prototype.reduce
-  if (!cls || !obj.reduceTo) obj.reduceTo = FunStream.prototype.reduceTo
-  if (!cls || !obj.reduceToArray) obj.reduceToArray = FunStream.prototype.reduceToArray
-  if (!cls || !obj.reduceToObject) obj.reduceToObject = FunStream.prototype.reduceToObject
-  if (!cls || !obj.concat) obj.concat = FunStream.prototype.concat
-  if (!cls || !obj.list) obj.list = FunStream.prototype.list
-  if (!cls || !obj.lines) obj.lines = FunStream.prototype.lines
-  if (!cls || !obj.json) obj.json = FunStream.prototype.json
-  if (!cls || !obj.ndjson) obj.ndjson = FunStream.prototype.ndjson
-  if (!cls || !obj.toJson) obj.toJson = FunStream.prototype.toJson
-  if (!cls || !obj.toNdjson) obj.toNdjson = FunStream.prototype.toNdjson
-  if (!cls || !obj.fromJson) obj.fromJson = FunStream.prototype.fromJson
-  if (!cls || !obj.fromNdjson) obj.fromNdjson = FunStream.prototype.fromNdjson
-  if (!cls || !obj.collect) obj.collect = FunStream.prototype.collect
-  if (!cls || !obj.grab) obj.grab = FunStream.prototype.grab
-  if (!cls || !obj.sort) obj.sort = FunStream.prototype.sort
-  if (!cls || !obj.forEach) obj.forEach = FunStream.prototype.forEach
-  if (!cls || !obj.sync) obj.sync = FunStream.prototype.sync
-  if (!cls || !obj.async) obj.async = FunStream.prototype.async
-  if (!cls || !obj.whenWritable) obj.whenWritable = FunStream.prototype.whenWritable
+  mixinOne(cls, obj, 'mutate')
+  mixinOne(cls, obj, 'flat')
+  mixinOne(cls, obj, 'head')
+  mixinOne(cls, obj, 'reduceTo')
+  mixinOne(cls, obj, 'reduceToArray')
+  mixinOne(cls, obj, 'reduceToObject')
+  mixinOne(cls, obj, 'concat')
+  mixinOne(cls, obj, 'json')
+  mixinOne(cls, obj, 'toJson')
+  mixinOne(cls, obj, 'fromJson')
+  mixinOne(cls, obj, 'list')
+  mixinOne(cls, obj, 'lines')
+  mixinOne(cls, obj, 'ndjson')
+  mixinOne(cls, obj, 'toNdjson')
+  mixinOne(cls, obj, 'fromNdjson')
+  mixinOne(cls, obj, 'collect')
+  mixinOne(cls, obj, 'grab')
+  mixinOne(cls, obj, 'sort')
+  mixinOne(cls, obj, 'sync')
+  mixinOne(cls, obj, 'async')
+  mixinOne(cls, obj, 'whenWritable')
+  forceMixinOne(cls, obj, 'reduce')
+  forceMixinOne(cls, obj, 'filter')
+  forceMixinOne(cls, obj, 'map')
+  forceMixinOne(cls, obj, 'flatMap')
+  forceMixinOne(cls, obj, 'forEach')
 
   obj[PIPE] = obj.pipe
   Object.defineProperty(obj, 'pipe', {
