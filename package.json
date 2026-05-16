@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "pnpm run test-and-coverage",
-    "test-and-coverage": "tap -J --branches=67 --lines=75 --functions=66 --statements=72  test/*.js test/async/*.js"
+    "test-and-coverage": "tap -J --statements=97 --branches=91 --functions=97 --lines=99  test/*.js test/async/*.js"
   },
   "keywords": [],
   "engines": {
