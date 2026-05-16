@@ -165,7 +165,6 @@ class StreamPromise extends FunStream {
   destroy (error) {
     if (!this[STREAM]) this[MAKEME]()
     this[STREAM].destroy(error)
-    this[STREAM].destroy(error)
     return this
   }
   // Writable
