@@ -1,6 +1,5 @@
 'use strict'
 const test = require('tap').test
-const fun = require('../index.js')
 const requireInject = require('require-inject')
 const FunPassThrough = require('../fun-passthrough.js')
 const stream = require('stream')
