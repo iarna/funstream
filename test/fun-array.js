@@ -69,3 +69,44 @@ test('backpressure', (t) => {
     t.done()
   })
 })
+
+test('fun-array sync forEach', t => {
+  const results = []
+  const arr = fun([1, 2, 3])
+  t.ok(arr.forEach, 'has forEach method')
+  arr.forEach(v => results.push(v))
+    .then(() => {
+      t.isDeeply(results, [1, 2, 3], 'sync forEach collects values')
+      t.end()
+    })
+    .catch(t.threw)
+})
+
+test('fun-array async forEach', t => {
+  const results = []
+  const arr = fun([1, 2, 3])
+  arr.forEach(function (v, cb) { results.push(v); cb() })
+    .then(() => {
+      t.isDeeply(results, [1, 2, 3], 'async forEach collects values')
+      t.end()
+    })
+    .catch(t.threw)
+})
+
+test('fun-array empty array', t => {
+  fun([]).list()
+    .then(result => {
+      t.isDeeply(result, [], 'empty array produces no data')
+      t.end()
+    })
+    .catch(t.threw)
+})
+
+test('fun-array single element', t => {
+  fun([42]).list()
+    .then(result => {
+      t.isDeeply(result, [42], 'single element')
+      t.end()
+    })
+    .catch(t.threw)
+})
